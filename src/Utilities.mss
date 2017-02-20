@@ -379,9 +379,9 @@ function NormalizedBeamProp (noteRest) {
 function NextNormalOrGrace (noteRest, grace) {
     //$module(Utilities.mss)
     /*
-        When given a 'normal' NoteRest, this function returns the next 'normal' NoteRest
+        When `grace` is false, this function returns the next 'normal' NoteRest
         in the same voice.
-        When given a grace NoteRest, this function returns the immediately adjacent 
+        When `grace` is true, this function returns the immediately adjacent 
         following grace NoteRest, if existant.
         This function is basically a duplicate of PrevNormalOrGrace() with 
         'Previous' replaced by 'Next'.
