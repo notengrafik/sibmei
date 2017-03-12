@@ -78,7 +78,7 @@ function SimpleNoteHash (nobj) {
 
 }  //$end
 
-function GetNoteObjectAtPosition (bobj) {
+function GetNoteObjectAtPosition (bobj, endPosition) {
     //$module(Utilities.mss)
     // takes a dictionary of {pos:id} mappings for a given
     // voice, and returns the NoteRest object. If one isn't found
@@ -87,8 +87,18 @@ function GetNoteObjectAtPosition (bobj) {
 
     objectPositions = Self._property:ObjectPositions;
     staff_num = bobj.ParentBar.ParentStaff.StaffNum;
-    bar_num = bobj.ParentBar.BarNumber;
     voice_num = bobj.VoiceNumber;
+
+    if (endPosition)
+    {
+        position = bobj.EndPosition;
+        bar_num = bobj.EndBarNumber;
+    }
+    else
+    {
+        position = bobj.Position;
+        bar_num = bobj.ParentBar.BarNumber;
+    }
 
     staffObjectPositions = objectPositions[staff_num];
     barObjectPositions = staffObjectPositions[bar_num];
@@ -100,10 +110,10 @@ function GetNoteObjectAtPosition (bobj) {
         Log('Bailing due to insufficient voice information');
         return null;
     }
-
-    if (voiceObjectPositions.PropertyExists(bobj.Position))
+    
+    if (voiceObjectPositions.PropertyExists(position))
     {
-        obj_id = voiceObjectPositions[bobj.Position];
+        obj_id = voiceObjectPositions[position];
         obj = libmei.getElementById(obj_id);
         return obj;
     }
@@ -140,7 +150,8 @@ function GetNoteObjectAtPosition (bobj) {
 function AddBarObjectInfoToElement (bobj, element) {
     //$module(Utilities.mss)
     /*
-        adds timing and position info (tstamps, etc.) to an element.
+        //TODO: Implement this promise (startids, endids)
+        adds timing and position info (startids, endids, tstamps, etc.) to an element
         This info is mostly derived from the base BarObject class.
     */
     voicenum = bobj.VoiceNumber;
@@ -169,32 +180,62 @@ function AddBarObjectInfoToElement (bobj, element) {
     {
         case('Line')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
         }
         case('Slur')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
         }
         case('DiminuendoLine')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
         }
         case('CrescendoLine')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
         }
         case('GlissandoLine')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
         }
         case('Trill')
         {
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+            line = true;
+        }
+        default {
+            line = false;
         }
     }
 
     libmei.AddAttribute(element, 'staff', bar.ParentStaff.StaffNum);
     libmei.AddAttribute(element, 'layer', voicenum);
+    
+    startNote = GetNoteObjectAtPosition(bobj, false);
+    if (startNote != null)
+    {
+        libmei.AddAttribute(element, 'startid', '#' & startNote._id);
+    }
+
+    if (line = true)
+    {
+        libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
+        // The endpoint of a line usually is 'in the future'. We didn't generate the elements
+        // and IDs that the lines are attached to yet. When GenerateStaff() 'in the future'
+        // processes the ending measure, it will step through the elements we recorded here
+        // and add endids.
+        element._property:bobj = bobj;
+        barmap = Self._property:BarMap;
+        endBarMap = barmap[bobj.EndBarNumber];
+        endingLinesInEndBar = endBarMap._property:EndingLines;
+        if (endingLinesInEndBar = null)
+        {
+            endBarMap._property:EndingLines = CreateSparseArray(element);
+        }
+        else
+        {
+            endingLinesInEndBar.Push(element);
+        }
+    }
 
     if (bobj.Dx > 0)
     {

@@ -314,7 +314,7 @@ function ProcessLyric (lyricobj, objectPositions) {
             }
         }
 
-        obj = GetNoteObjectAtPosition(syl);
+        obj = GetNoteObjectAtPosition(syl, false);
 
         if (obj != null)
         {
@@ -561,7 +561,7 @@ function ProcessSymbol (sobj) {
         }
         case ('52')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -572,7 +572,7 @@ function ProcessSymbol (sobj) {
         }
         case ('53')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -583,7 +583,7 @@ function ProcessSymbol (sobj) {
         }
         case ('54')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -594,7 +594,7 @@ function ProcessSymbol (sobj) {
         }
         case ('55')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -605,7 +605,7 @@ function ProcessSymbol (sobj) {
         }
         case ('160')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -615,7 +615,7 @@ function ProcessSymbol (sobj) {
         }
         case ('162')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -625,7 +625,7 @@ function ProcessSymbol (sobj) {
         }
         case ('163')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -635,7 +635,7 @@ function ProcessSymbol (sobj) {
         }
         case ('164')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -646,7 +646,7 @@ function ProcessSymbol (sobj) {
         }
         case ('165')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -656,7 +656,7 @@ function ProcessSymbol (sobj) {
         }
         case ('166')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -667,7 +667,7 @@ function ProcessSymbol (sobj) {
         }
         case ('212')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -678,7 +678,7 @@ function ProcessSymbol (sobj) {
         }
         case ('214')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -691,7 +691,7 @@ function ProcessSymbol (sobj) {
         case ('217')
         {
             // up-bow above
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -704,7 +704,7 @@ function ProcessSymbol (sobj) {
         case ('218')
         {
             // down-bow above
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -718,7 +718,7 @@ function ProcessSymbol (sobj) {
         case ('233')
         {
             // up-bow below
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -731,7 +731,7 @@ function ProcessSymbol (sobj) {
         case ('234')
         {
             // down-bow below
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -764,7 +764,7 @@ function ProcessSymbol (sobj) {
         case ('243')
         {
             // snap
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -781,7 +781,7 @@ function ProcessSymbol (sobj) {
         case ('480')
         {
             //scoop
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -792,7 +792,7 @@ function ProcessSymbol (sobj) {
         case ('481')
         {
             //fall
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -803,7 +803,7 @@ function ProcessSymbol (sobj) {
         }
         case ('490')
         {
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {
@@ -815,7 +815,7 @@ function ProcessSymbol (sobj) {
         case ('494')
         {
             //doit
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -827,7 +827,7 @@ function ProcessSymbol (sobj) {
         case ('495')
         {
             //plop
-            nobj = GetNoteObjectAtPosition(sobj);
+            nobj = GetNoteObjectAtPosition(sobj, false);
 
             if (nobj != null)
             {

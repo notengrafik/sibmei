@@ -401,6 +401,19 @@ function GenerateMeasure (num) {
             }
         }
     }
+    
+    if (staves._property:EndingLines != null)
+    {
+        for each line in staves._property:EndingLines
+        {
+            endNote = GetNoteObjectAtPosition(line.bobj, true);
+            if (endNote != null)
+            {
+                libmei.AddAttribute(line, 'endid', '#' & endNote._id);
+            }
+        }
+    }
+
 
     return m;
 }  //$end
@@ -1449,7 +1462,7 @@ function GenerateTrill (bobj) {
     */
     trill = libmei.Trill();
     bar = bobj.ParentBar;
-    obj = GetNoteObjectAtPosition(bobj);
+    obj = GetNoteObjectAtPosition(bobj, false);
 
     if (obj != null)
     {
