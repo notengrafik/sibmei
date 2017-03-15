@@ -110,7 +110,7 @@ function GetNoteObjectAtPosition (bobj, endPosition) {
         Log('Bailing due to insufficient voice information');
         return null;
     }
-    
+
     if (voiceObjectPositions.PropertyExists(position))
     {
         obj_id = voiceObjectPositions[position];
@@ -147,7 +147,26 @@ function GetNoteObjectAtPosition (bobj, endPosition) {
     return null;
 }  //$end
 
-function AddBarObjectInfoToElement (bobj, element) {
+function AddBarObjectInfoLater (bobj, element) {
+    //$module(Utilities.mss)
+    // The attachment elements of a line are usually processed after the line elments.
+    // We therefore have to defer AddBarObjectInfoToElement() for lines until we have
+    // processed the measure they are ending in.
+    element._property:bobj = bobj;
+    barMap = Self._property:BarMap;
+    endBarMap = barMap[bobj.EndBarNumber];
+    linesEndingAtBar = endBarMap._property:EndingLines;
+    if (linesEndingAtBar = null)
+    {
+        endBarMap._property:EndingLines = CreateSparseArray(element);
+    }
+    else
+    {
+        linesEndingAtBar.Push(element);
+    }
+}  //$end
+
+function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
     //$module(Utilities.mss)
     /*
         //TODO: Implement this promise (startids, endids)
@@ -175,38 +194,6 @@ function AddBarObjectInfoToElement (bobj, element) {
     }
 
     libmei.AddAttribute(element, 'tstamp', ConvertPositionToTimestamp(bobj.Position, bar));
-
-    switch (bobj.Type)
-    {
-        case('Line')
-        {
-            line = true;
-        }
-        case('Slur')
-        {
-            line = true;
-        }
-        case('DiminuendoLine')
-        {
-            line = true;
-        }
-        case('CrescendoLine')
-        {
-            line = true;
-        }
-        case('GlissandoLine')
-        {
-            line = true;
-        }
-        case('Trill')
-        {
-            line = true;
-        }
-        default {
-            line = false;
-        }
-    }
-
     libmei.AddAttribute(element, 'staff', bar.ParentStaff.StaffNum);
     libmei.AddAttribute(element, 'layer', voicenum);
     
@@ -216,24 +203,13 @@ function AddBarObjectInfoToElement (bobj, element) {
         libmei.AddAttribute(element, 'startid', '#' & startNote._id);
     }
 
-    if (line = true)
+    if (addEndInfo = true)
     {
         libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
-        // The endpoint of a line usually is 'in the future'. We didn't generate the elements
-        // and IDs that the lines are attached to yet. When GenerateStaff() 'in the future'
-        // processes the ending measure, it will step through the elements we recorded here
-        // and add endids.
-        element._property:bobj = bobj;
-        barmap = Self._property:BarMap;
-        endBarMap = barmap[bobj.EndBarNumber];
-        endingLinesInEndBar = endBarMap._property:EndingLines;
-        if (endingLinesInEndBar = null)
+        endNote = GetNoteObjectAtPosition(bobj, true);
+        if (endNote != null)
         {
-            endBarMap._property:EndingLines = CreateSparseArray(element);
-        }
-        else
-        {
-            endingLinesInEndBar.Push(element);
+            libmei.AddAttribute(element, 'endid', '#' & endNote._id);
         }
     }
 

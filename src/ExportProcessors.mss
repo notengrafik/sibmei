@@ -525,7 +525,7 @@ function ProcessSymbol (sobj) {
             // inverted mordent
             mordent = libmei.Mordent();
             libmei.AddAttribute(mordent, 'form', 'inv');
-            mordent = AddBarObjectInfoToElement(sobj, mordent);
+            mordent = AddBarObjectInfoToElement(sobj, mordent, false);
             mlines = Self._property:MeasureObjects;
             mlines.Push(mordent._id);
         }
@@ -535,7 +535,7 @@ function ProcessSymbol (sobj) {
             // mordent
             mordent = libmei.Mordent();
             libmei.AddAttribute(mordent, 'form', 'norm');
-            mordent = AddBarObjectInfoToElement(sobj, mordent);
+            mordent = AddBarObjectInfoToElement(sobj, mordent, false);
             mlines = Self._property:MeasureObjects;
             mlines.Push(mordent._id);
         }
@@ -545,7 +545,7 @@ function ProcessSymbol (sobj) {
             // turn
             turn = libmei.Turn();
             libmei.AddAttribute(turn, 'form', 'norm');
-            turn = AddBarObjectInfoToElement(sobj, turn);
+            turn = AddBarObjectInfoToElement(sobj, turn, false);
             mlines = Self._property:MeasureObjects;
             mlines.Push(turn._id);
         }
@@ -555,7 +555,7 @@ function ProcessSymbol (sobj) {
             // inverted turn
             turn = libmei.Turn();
             libmei.AddAttribute(turn, 'form', 'inv');
-            turn = AddBarObjectInfoToElement(sobj, turn);
+            turn = AddBarObjectInfoToElement(sobj, turn, false);
             mlines = Self._property:MeasureObjects;
             mlines.Push(turn._id);
         }

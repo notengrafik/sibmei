@@ -406,14 +406,11 @@ function GenerateMeasure (num) {
     {
         for each line in staves._property:EndingLines
         {
-            endNote = GetNoteObjectAtPosition(line.bobj, true);
-            if (endNote != null)
-            {
-                libmei.AddAttribute(line, 'endid', '#' & endNote._id);
-            }
+            AddBarObjectInfoToElement (line._property:bobj, line, true);
         }
+        // Free some memory:
+        staves._property:EndingLines = null;
     }
-
 
     return m;
 }  //$end
@@ -1449,7 +1446,7 @@ function GenerateLine (bobj) {
         return null;
     }
 
-    line = AddBarObjectInfoToElement(bobj, line);
+    AddBarObjectInfoLater(bobj, line);
 
     return line;
 }  //$end
@@ -1469,7 +1466,7 @@ function GenerateTrill (bobj) {
         libmei.AddAttribute(trill, 'startid', '#' & obj._id);
     }
 
-    trill = AddBarObjectInfoToElement(bobj, trill);
+    trill = AddBarObjectInfoToElement(bobj, trill, false);
 
     return trill;
 }  //$end
@@ -1530,7 +1527,7 @@ function GenerateFermata (bobj) {
     libmei.AddAttribute(fermata, 'form', 'norm');
     libmei.AddAttribute(fermata, 'shape', shape);
 
-    fermata = AddBarObjectInfoToElement(bobj, fermata);
+    fermata = AddBarObjectInfoToElement(bobj, fermata, false);
 
     return fermata;
 }  //$end
