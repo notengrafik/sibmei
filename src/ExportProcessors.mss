@@ -839,4 +839,45 @@ function ProcessSymbol (sobj) {
         }
 
     }
+} //$end
+
+function ProcessActiveSpanners (bobj, meiId) {
+    //$module(ExportProcessors.mss)
+    // We add the bobj's ID to any active spanner's plist.
+    // When bobj is null, we're at the end of the score and must end all spanners.
+
+    spanner = Self._property:ActiveSpanner;
+    prevSpanner = null;
+    if (bobj != null)
+    {
+        barNum = bobj.ParentBar.BarNumber;
+        pos = bobj.Position;
+    }
+    while (spanner != null)
+    {
+        endBarNum = spanner.EndBarNumber;
+        endPos = spanner.EndPosition;
+        if ((bobj != null) and ((barNum < endBarNum) or ((barNum = endBarNum) and (pos < endPos))))
+        {
+            spanner._property:Plist = spanner._property:Plist & ' #' & meiId;
+            prevSpanner = spanner;
+        }
+        else
+        {
+            // We went beyond the point where this spanner ends, so
+            //  * add all start/end information (no new info coming beyond this point)
+            //  * remove it from the linked list of active spanners
+            AddBarObjectInfoToElement(spanner, spanner._property:MeiElement, true);
+            if (prevSpanner != null)
+            {
+                prevSpanner._property:NextActiveSpanner = spanner._property:NextActiveSpanner;
+            }
+            else
+            {
+                Self._property:ActiveSpanner = spanner._property:NextActiveSpanner;
+            }
+        }
+        spanner = spanner._property:NextActiveSpanner;
+    }
 }  //$end
+
