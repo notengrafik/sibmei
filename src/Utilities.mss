@@ -147,29 +147,9 @@ function GetNoteObjectAtPosition (bobj, endPosition) {
     return null;
 }  //$end
 
-function AddBarObjectInfoLater (bobj, element) {
-    //$module(Utilities.mss)
-    // The attachment elements of a line are usually processed after the line elments.
-    // We therefore have to defer AddBarObjectInfoToElement() for lines until we have
-    // processed the measure they are ending in.
-    element._property:bobj = bobj;
-    barMap = Self._property:BarMap;
-    endBarMap = barMap[bobj.EndBarNumber];
-    linesEndingAtBar = endBarMap._property:EndingLines;
-    if (linesEndingAtBar = null)
-    {
-        endBarMap._property:EndingLines = CreateSparseArray(element);
-    }
-    else
-    {
-        linesEndingAtBar.Push(element);
-    }
-}  //$end
-
 function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
     //$module(Utilities.mss)
     /*
-        //TODO: Implement this promise (startids, endids)
         adds timing and position info (startids, endids, tstamps, etc.) to an element
         This info is mostly derived from the base BarObject class.
     */
@@ -184,15 +164,6 @@ function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
         warnings.Push(utils.Format(_ObjectAssignedToAllVoicesWarning, bar.BarNumber, voicenum, 'Bar object'));
     }
 
-    if (bobj.Type = 'Line')
-    {
-        // lines have durations, but symbols do not.
-        if (bobj.Duration > 0)
-        {
-            libmei.AddAttribute(element, 'dur.ges', bobj.Duration & 'p');
-        }
-    }
-
     libmei.AddAttribute(element, 'tstamp', ConvertPositionToTimestamp(bobj.Position, bar));
     libmei.AddAttribute(element, 'staff', bar.ParentStaff.StaffNum);
     libmei.AddAttribute(element, 'layer', voicenum);
@@ -205,12 +176,17 @@ function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
 
     if (addEndInfo = true)
     {
+        if (bobj.Duration > 0)
+        {
+            libmei.AddAttribute(element, 'dur.ges', bobj.Duration & 'p');
+        }
         libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
         endNote = GetNoteObjectAtPosition(bobj, true);
         if (endNote != null)
         {
             libmei.AddAttribute(element, 'endid', '#' & endNote._id);
         }
+        libmei.AddAttribute(element, 'plist', lstrip(bobj._property:Plist));
     }
 
     if (bobj.Dx > 0)

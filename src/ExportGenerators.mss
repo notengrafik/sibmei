@@ -406,7 +406,9 @@ function GenerateMeasure (num) {
     {
         for each line in staves._property:EndingLines
         {
-            AddBarObjectInfoToElement (line._property:bobj, line, true);
+            // The only Sibelius spanner we convert to a non-spanner MEI element are lines
+            // with StyleId = 'line.staff.vertical', which we turn into <barLine> elements
+            AddBarObjectInfoToElement (line._property:bobj, line, line.name != 'barLine');
         }
         // Free some memory:
         staves._property:EndingLines = null;
@@ -873,6 +875,37 @@ function GenerateNoteRest (bobj, layer) {
         }
 
         libmei.AddAttribute(nr, 'stem.mod', stemmod);
+    }
+
+    // We add the note's ID to any active spanner's plist.
+    spanner = Self._property:ActiveSpanner;
+    prevSpanner = null;
+    barNum = bobj.ParentBar.BarNumber;
+    pos = bobj.Position;
+    while (spanner != null)
+    {
+        endBarNum = spanner.EndBarNumber;
+        endPos = spanner.EndPosition;
+        if ((barNum < endBarNum) or ((barNum = endBarNum) and (pos < endPos)))
+        {
+            spanner._property:Plist = spanner._property:Plist & ' #' & nr._id;
+        }
+        else
+        {
+            // We went beyond the point where this spanner ends, so
+            // * add all start/end information (no new info coming beyond this point)
+            // * remove it from the linked list of active spanners and
+            AddBarObjectInfoToElement(spanner, spanner._property:MeiElement, true);
+            if (prevSpanner != null)
+            {
+                prevSpanner._property:NextActiveSpanner = spanner._property:NextActiveSpanner;
+            }
+            else
+            {
+                Self._property:ActiveSpanner = spanner._property:NextActiveSpanner;
+            }
+        }
+        spanner = spanner._property:NextActiveSpanner;
     }
 
     return nr;
@@ -1446,7 +1479,12 @@ function GenerateLine (bobj) {
         return null;
     }
 
-    AddBarObjectInfoLater(bobj, line);
+    // We add this spanner to the linked list of active spanners
+    bobj._property:Plist = '';
+    bobj._property:NextActiveSpanner = Self._property:ActiveSpanner;
+    Self._property:ActiveSpanner = bobj;
+
+    bobj._property:MeiElement = line;
 
     return line;
 }  //$end
