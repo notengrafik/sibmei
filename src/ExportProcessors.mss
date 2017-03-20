@@ -314,7 +314,7 @@ function ProcessLyric (lyricobj, objectPositions) {
             }
         }
 
-        obj = GetNoteObjectAtPosition(syl, false);
+        obj = GetNoteObjectAtPosition(syl);
 
         if (obj != null)
         {
@@ -525,7 +525,7 @@ function ProcessSymbol (sobj) {
             // inverted mordent
             mordent = libmei.Mordent();
             libmei.AddAttribute(mordent, 'form', 'inv');
-            mordent = AddBarObjectInfoToElement(sobj, mordent, false);
+            mordent = AddBarObjectInfoToElement(sobj, mordent);
             mlines = Self._property:MeasureObjects;
             mlines.Push(mordent._id);
         }
@@ -535,7 +535,7 @@ function ProcessSymbol (sobj) {
             // mordent
             mordent = libmei.Mordent();
             libmei.AddAttribute(mordent, 'form', 'norm');
-            mordent = AddBarObjectInfoToElement(sobj, mordent, false);
+            mordent = AddBarObjectInfoToElement(sobj, mordent);
             mlines = Self._property:MeasureObjects;
             mlines.Push(mordent._id);
         }
@@ -545,7 +545,7 @@ function ProcessSymbol (sobj) {
             // turn
             turn = libmei.Turn();
             libmei.AddAttribute(turn, 'form', 'norm');
-            turn = AddBarObjectInfoToElement(sobj, turn, false);
+            turn = AddBarObjectInfoToElement(sobj, turn);
             mlines = Self._property:MeasureObjects;
             mlines.Push(turn._id);
         }
@@ -555,13 +555,13 @@ function ProcessSymbol (sobj) {
             // inverted turn
             turn = libmei.Turn();
             libmei.AddAttribute(turn, 'form', 'inv');
-            turn = AddBarObjectInfoToElement(sobj, turn, false);
+            turn = AddBarObjectInfoToElement(sobj, turn);
             mlines = Self._property:MeasureObjects;
             mlines.Push(turn._id);
         }
         case ('52')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -572,7 +572,7 @@ function ProcessSymbol (sobj) {
         }
         case ('53')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -583,7 +583,7 @@ function ProcessSymbol (sobj) {
         }
         case ('54')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -594,7 +594,7 @@ function ProcessSymbol (sobj) {
         }
         case ('55')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -605,7 +605,7 @@ function ProcessSymbol (sobj) {
         }
         case ('160')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -615,7 +615,7 @@ function ProcessSymbol (sobj) {
         }
         case ('162')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -625,7 +625,7 @@ function ProcessSymbol (sobj) {
         }
         case ('163')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -635,7 +635,7 @@ function ProcessSymbol (sobj) {
         }
         case ('164')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -646,7 +646,7 @@ function ProcessSymbol (sobj) {
         }
         case ('165')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -656,7 +656,7 @@ function ProcessSymbol (sobj) {
         }
         case ('166')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -667,7 +667,7 @@ function ProcessSymbol (sobj) {
         }
         case ('212')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -678,7 +678,7 @@ function ProcessSymbol (sobj) {
         }
         case ('214')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -691,7 +691,7 @@ function ProcessSymbol (sobj) {
         case ('217')
         {
             // up-bow above
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -704,7 +704,7 @@ function ProcessSymbol (sobj) {
         case ('218')
         {
             // down-bow above
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -718,7 +718,7 @@ function ProcessSymbol (sobj) {
         case ('233')
         {
             // up-bow below
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -731,7 +731,7 @@ function ProcessSymbol (sobj) {
         case ('234')
         {
             // down-bow below
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -764,7 +764,7 @@ function ProcessSymbol (sobj) {
         case ('243')
         {
             // snap
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -781,7 +781,7 @@ function ProcessSymbol (sobj) {
         case ('480')
         {
             //scoop
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -792,7 +792,7 @@ function ProcessSymbol (sobj) {
         case ('481')
         {
             //fall
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -803,7 +803,7 @@ function ProcessSymbol (sobj) {
         }
         case ('490')
         {
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -815,7 +815,7 @@ function ProcessSymbol (sobj) {
         case ('494')
         {
             //doit
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
             if (nobj != null)
             {
                 artic = libmei.Artic();
@@ -827,7 +827,7 @@ function ProcessSymbol (sobj) {
         case ('495')
         {
             //plop
-            nobj = GetNoteObjectAtPosition(sobj, false);
+            nobj = GetNoteObjectAtPosition(sobj);
 
             if (nobj != null)
             {
@@ -843,8 +843,14 @@ function ProcessSymbol (sobj) {
 
 function ProcessActiveSpanners (bobj, meiId) {
     //$module(ExportProcessors.mss)
-    // We add the bobj's ID to any active spanner's plist.
-    // When bobj is null, we're at the end of the score and must end all spanners.
+    /*
+        This function does two things:
+         * Adds the bobj's ID to any active spanner's plist.
+         * When we've gone beyond the end of an active spanner, adds 
+           start/end/plist/duration info.
+        This function is also called with `nil` arguments when we've 
+        reached the end of the score.
+    */
 
     spanner = Self._property:ActiveSpanner;
     prevSpanner = null;
@@ -852,22 +858,44 @@ function ProcessActiveSpanners (bobj, meiId) {
     {
         barNum = bobj.ParentBar.BarNumber;
         pos = bobj.Position;
+        bobjVoiceNum = bobj.VoiceNumber;
     }
     while (spanner != null)
     {
         endBarNum = spanner.EndBarNumber;
         endPos = spanner.EndPosition;
-        if ((bobj != null) and ((barNum < endBarNum) or ((barNum = endBarNum) and (pos < endPos))))
+        spannerVoiceNum = spanner.VoiceNumber;
+        if (
+            (bobj != null) 
+            and ((spannerVoiceNum = 0) or (spannerVoiceNum = bobjVoiceNum)) 
+            and ((barNum < endBarNum) or ((barNum = endBarNum) and (pos <= endPos)))
+        )
         {
-            spanner._property:Plist = spanner._property:Plist & ' #' & meiId;
+            plist = spanner._property:Plist;
+            plist.Push('#' & meiId);
             prevSpanner = spanner;
         }
         else
         {
-            // We went beyond the point where this spanner ends, so
+            // We went beyond the point where this spanner ends, so...
             //  * add all start/end information (no new info coming beyond this point)
+            element = spanner._property:MeiElement;
+            plist = spanner._property:Plist;
+
+            AddBarObjectInfoToElement(spanner, element);
+            if (spanner.Duration > 0)
+            {
+                libmei.AddAttribute(element, 'dur.ges', spanner.Duration & 'p');
+            }
+            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(spanner));
+            libmei.AddAttribute(element, 'plist', plist.Join(' '));
+            if ((spannerVoiceNum != 0) and (plist.Length > 0))
+            {
+                libmei.AddAttribute(element, 'endid', plist[plist.Length - 1]);
+                libmei.AddAttribute(element, 'layer', spanner.VoiceNumber);
+            }
+
             //  * remove it from the linked list of active spanners
-            AddBarObjectInfoToElement(spanner, spanner._property:MeiElement, true);
             if (prevSpanner != null)
             {
                 prevSpanner._property:NextActiveSpanner = spanner._property:NextActiveSpanner;

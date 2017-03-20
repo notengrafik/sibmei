@@ -78,7 +78,7 @@ function SimpleNoteHash (nobj) {
 
 }  //$end
 
-function GetNoteObjectAtPosition (bobj, endPosition) {
+function GetNoteObjectAtPosition (bobj) {
     //$module(Utilities.mss)
     // takes a dictionary of {pos:id} mappings for a given
     // voice, and returns the NoteRest object. If one isn't found
@@ -87,18 +87,9 @@ function GetNoteObjectAtPosition (bobj, endPosition) {
 
     objectPositions = Self._property:ObjectPositions;
     staff_num = bobj.ParentBar.ParentStaff.StaffNum;
+    bar_num = bobj.ParentBar.BarNumber;
     voice_num = bobj.VoiceNumber;
-
-    if (endPosition)
-    {
-        position = bobj.EndPosition;
-        bar_num = bobj.EndBarNumber;
-    }
-    else
-    {
-        position = bobj.Position;
-        bar_num = bobj.ParentBar.BarNumber;
-    }
+    position = bobj.Position;
 
     staffObjectPositions = objectPositions[staff_num];
     barObjectPositions = staffObjectPositions[bar_num];
@@ -147,7 +138,7 @@ function GetNoteObjectAtPosition (bobj, endPosition) {
     return null;
 }  //$end
 
-function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
+function AddBarObjectInfoToElement (bobj, element) {
     //$module(Utilities.mss)
     /*
         adds timing and position info (startids, endids, tstamps, etc.) to an element
@@ -168,25 +159,10 @@ function AddBarObjectInfoToElement (bobj, element, addEndInfo) {
     libmei.AddAttribute(element, 'staff', bar.ParentStaff.StaffNum);
     libmei.AddAttribute(element, 'layer', voicenum);
     
-    startNote = GetNoteObjectAtPosition(bobj, false);
+    startNote = GetNoteObjectAtPosition(bobj);
     if (startNote != null)
     {
         libmei.AddAttribute(element, 'startid', '#' & startNote._id);
-    }
-
-    if (addEndInfo = true)
-    {
-        if (bobj.Duration > 0)
-        {
-            libmei.AddAttribute(element, 'dur.ges', bobj.Duration & 'p');
-        }
-        libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(bobj));
-        endNote = GetNoteObjectAtPosition(bobj, true);
-        if (endNote != null)
-        {
-            libmei.AddAttribute(element, 'endid', '#' & endNote._id);
-        }
-        libmei.AddAttribute(element, 'plist', lstrip(bobj._property:Plist));
     }
 
     if (bobj.Dx > 0)

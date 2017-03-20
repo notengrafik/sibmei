@@ -404,7 +404,7 @@ function GenerateMeasure (num) {
             }
         }
     }
-    
+
     return m;
 }  //$end
 
@@ -1442,7 +1442,7 @@ function GenerateLine (bobj) {
     }
 
     // We add this spanner to the linked list of active spanners
-    bobj._property:Plist = '';
+    bobj._property:Plist = CreateSparseArray();
     bobj._property:NextActiveSpanner = Self._property:ActiveSpanner;
     Self._property:ActiveSpanner = bobj;
 
@@ -1459,14 +1459,14 @@ function GenerateTrill (bobj) {
     */
     trill = libmei.Trill();
     bar = bobj.ParentBar;
-    obj = GetNoteObjectAtPosition(bobj, false);
+    obj = GetNoteObjectAtPosition(bobj);
 
     if (obj != null)
     {
         libmei.AddAttribute(trill, 'startid', '#' & obj._id);
     }
 
-    trill = AddBarObjectInfoToElement(bobj, trill, false);
+    trill = AddBarObjectInfoToElement(bobj, trill);
 
     return trill;
 }  //$end
@@ -1527,7 +1527,7 @@ function GenerateFermata (bobj) {
     libmei.AddAttribute(fermata, 'form', 'norm');
     libmei.AddAttribute(fermata, 'shape', shape);
 
-    fermata = AddBarObjectInfoToElement(bobj, fermata, false);
+    fermata = AddBarObjectInfoToElement(bobj, fermata);
 
     return fermata;
 }  //$end
