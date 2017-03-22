@@ -851,7 +851,7 @@ function ProcessActiveSpanners (bobj, meiId) {
         This function is also called with `nil` arguments when we've 
         reached the end of the score.
     */
-
+  
     spanner = Self._property:ActiveSpanner;
     prevSpanner = null;
     if (bobj != null)
@@ -862,14 +862,7 @@ function ProcessActiveSpanners (bobj, meiId) {
     }
     while (spanner != null)
     {
-        endBarNum = spanner.EndBarNumber;
-        endPos = spanner.EndPosition;
-        spannerVoiceNum = spanner.VoiceNumber;
-        if (
-            (bobj != null) 
-            and ((spannerVoiceNum = 0) or (spannerVoiceNum = bobjVoiceNum)) 
-            and ((barNum < endBarNum) or ((barNum = endBarNum) and (pos <= endPos)))
-        )
+        if ((bobj != null) and (SpannerAppliesToBobj(spanner, bobj)))
         {
             plist = spanner._property:Plist;
             plist.Push('#' & meiId);
@@ -889,7 +882,7 @@ function ProcessActiveSpanners (bobj, meiId) {
             }
             libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(spanner));
             libmei.AddAttribute(element, 'plist', plist.Join(' '));
-            if ((spannerVoiceNum != 0) and (plist.Length > 0))
+            if ((spanner.VoiceNumber != 0) and (plist.Length > 0))
             {
                 libmei.AddAttribute(element, 'endid', plist[plist.Length - 1]);
                 libmei.AddAttribute(element, 'layer', spanner.VoiceNumber);
@@ -908,4 +901,3 @@ function ProcessActiveSpanners (bobj, meiId) {
         spanner = spanner._property:NextActiveSpanner;
     }
 }  //$end
-

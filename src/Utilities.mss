@@ -515,3 +515,63 @@ function AppendToLayer (meielement, l, beam, tuplet) {
         }
     }
 }  //$end
+
+function SpannerAppliesToBobj (spanner, bobj) {
+    //$module(Utilities.mss)
+    spannerVoiceNum = spanner.VoiceNumber;
+    if ((spannerVoiceNum != 0) and (spannerVoiceNum != bobj.VoiceNumber))
+    {
+        return false;
+    }
+    bobjBarNum = bobj.ParentBar.BarNumber;
+    startBarNum = spanner.ParentBar.BarNumber;
+    endBarNum = spanner.EndBarNumber;
+    if ((bobjBarNum > endBarNum) or (bobjBarNum < startBarNum)) 
+    {
+        return false;
+    }
+    
+    startPos = spanner.Position;
+    bobjPos = bobj.Position;
+    if ((bobjBarNum = startBarNum) and (bobjPos < startPos))
+    {
+        return false;
+    }
+
+    endPos = spanner.EndPosition;
+    if (bobjBarNum = endBarNum)
+    {
+        // A spanner starting in the last bar 'n' that spans until the end of
+        // the bar strangely has EndPosition=0 and EndBarNumer=n rather than
+        // EndBarNumber=n+1 or EndPosition=1024 (in the case of 4/4).
+        if ((startBarNum = endBarNum) and (endPos = 0) and (startPos >= 0))
+        { 
+            return bobjPos >= startPos;
+        }
+
+        if (bobj.Type = 'OctavaLine') 
+        {
+            // Sibelius does not consider a note at the EndPosition of an
+            // ottava line to be part of the ottava. This becomes clear
+            //  * when creating an ottava for a single note (will stretch
+            //    until the Position of the next note - and visually beyond)
+            //  * when exporting MIDI (the note at the EndPosition will not
+            //    be transposed)
+            appliesToEndPosition = false;
+        }
+        else
+        {
+            appliesToEndPosition = true;
+        }
+
+        if (appliesToEndPosition)
+        {
+            return bobjPos < endPos;
+        }
+        else
+        {
+            return bobjPos <= endPos;
+        }
+    }
+    return true;
+}  //$end
