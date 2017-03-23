@@ -575,3 +575,38 @@ function SpannerAppliesToBobj (spanner, bobj) {
     }
     return true;
 }  //$end
+
+function NormalizedEndPosition (bobj) {
+    //$module(Utilities.mss)
+    /*
+      When spanners like octava lines are spanning until the end of a 
+      measure, they by default get their EndBarNumber set to the next 
+      bar and EndPosition set to 0.  However, if they end at the end 
+      of the last bar, EndBarNumber is not set to 'last bar + 1', it's 
+      set to the last bar while EndPosition is still 0.
+  
+      This means, the spanner appears to be ending sooner than it
+      actually does. In this case, EndBarNumber and EndPosition are not sufficient to
+      distinguish whether the spanner ends at position 0 or position 
+      1024 (in case of 4/4) of the last bar. We also need to check 
+      Duration.
+    */
+    endPosition = bobj.EndPosition;
+    if (endPosition = 0)
+    {
+        bar = bobj.ParentBar;
+        staff = bar.ParentStaff;
+        barCount = staff.BarCount;
+        if (bobj.EndBarNumber = staff.BarCount)
+        {
+            durationSum = bar.Length - bobj.Position;
+            while (bar.BarNumber < barCount - 1)
+            {
+                bar = staff.NthBar(bar.BarNumber + 1);
+                durationSum = durationSum + bar.Length;
+            }
+            return bobj.Duration > durationSum;
+        }
+    }
+    return endPosition;
+}  //$end
