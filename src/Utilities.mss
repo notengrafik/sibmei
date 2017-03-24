@@ -538,16 +538,9 @@ function SpannerAppliesToBobj (spanner, bobj) {
         return false;
     }
 
-    endPos = spanner.EndPosition;
     if (bobjBarNum = endBarNum)
     {
-        // A spanner starting in the last bar 'n' that spans until the end of
-        // the bar strangely has EndPosition=0 and EndBarNumer=n rather than
-        // EndBarNumber=n+1 or EndPosition=1024 (in the case of 4/4).
-        if ((startBarNum = endBarNum) and (endPos = 0) and (startPos >= 0))
-        { 
-            return bobjPos >= startPos;
-        }
+        endPos = NormalizedEndPosition(spanner);
 
         if (bobj.Type = 'OctavaLine') 
         {
@@ -557,6 +550,7 @@ function SpannerAppliesToBobj (spanner, bobj) {
             //    until the Position of the next note - and visually beyond)
             //  * when exporting MIDI (the note at the EndPosition will not
             //    be transposed)
+            // Other lines might behave similarly and will have to be added.
             appliesToEndPosition = false;
         }
         else
@@ -581,15 +575,15 @@ function NormalizedEndPosition (bobj) {
     /*
       When spanners like octava lines are spanning until the end of a 
       measure, they by default get their EndBarNumber set to the next 
-      bar and EndPosition set to 0.  However, if they end at the end 
-      of the last bar, EndBarNumber is not set to 'last bar + 1', it's 
-      set to the last bar while EndPosition is still 0.
+      bar and EndPosition set to 0.  However, if they end at the end of
+      the last bar, EndBarNumber is not set to 'last bar + 1', it's set
+      to the last bar while EndPosition is still 0.
   
       This means, the spanner appears to be ending sooner than it
-      actually does. In this case, EndBarNumber and EndPosition are not sufficient to
-      distinguish whether the spanner ends at position 0 or position 
-      1024 (in case of 4/4) of the last bar. We also need to check 
-      Duration.
+      actually does. In this case, EndBarNumber and EndPosition are not
+      sufficient to distinguish whether the spanner ends at position 0 or
+      position  1024 (in case of 4/4) of the last bar. We also need to 
+      check Duration.
     */
     endPosition = bobj.EndPosition;
     if (endPosition = 0)
@@ -597,25 +591,25 @@ function NormalizedEndPosition (bobj) {
         bar = bobj.ParentBar;
         staff = bar.ParentStaff;
         barCount = staff.BarCount;
-        if (bobj.EndBarNumber = staff.BarCount)
+        if (bobj.EndBarNumber = barCount)
         {
             if (bar.BarNumber = barCount)
             {
-                durationSum = 0;
+                return bobj.Duration;
             }
             else
             {
                 durationSum = bar.Length - bobj.Position;
-            }
-            while (bar.BarNumber < (barCount - 1))
-            {
-                bar = staff.NthBar(bar.BarNumber + 1);
-                durationSum = durationSum + bar.Length;
-            }
-            if (bobj.Duration > durationSum)
-            {
-                bar = staff.NthBar(barCount);
-                return bar.Length;
+                for n = bar.BarNumber + 1 to barCount
+                {
+                    nthBar = staff.NthBar(n);
+                    durationSum = durationSum + nthBar.Length;
+                }
+                if (bobj.Duration > durationSum)
+                {
+                    bar = staff.NthBar(barCount);
+                    return bar.Length;
+                }
             }
         }
     }
