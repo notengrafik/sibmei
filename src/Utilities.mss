@@ -599,13 +599,24 @@ function NormalizedEndPosition (bobj) {
         barCount = staff.BarCount;
         if (bobj.EndBarNumber = staff.BarCount)
         {
-            durationSum = bar.Length - bobj.Position;
-            while (bar.BarNumber < barCount - 1)
+            if (bar.BarNumber = barCount)
+            {
+                durationSum = 0;
+            }
+            else
+            {
+                durationSum = bar.Length - bobj.Position;
+            }
+            while (bar.BarNumber < (barCount - 1))
             {
                 bar = staff.NthBar(bar.BarNumber + 1);
                 durationSum = durationSum + bar.Length;
             }
-            return bobj.Duration > durationSum;
+            if (bobj.Duration > durationSum)
+            {
+                bar = staff.NthBar(barCount);
+                return bar.Length;
+            }
         }
     }
     return endPosition;
