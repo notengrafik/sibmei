@@ -140,6 +140,9 @@ function GenerateMEIMusic () {
     Self._property:SystemBreak = null;
     Self._property:FrontMatter = CreateDictionary();
 
+    // Track active spanners staff by staff
+    Self._property:ActiveSpannerByStaff = CreateSparseArray();
+
     // grab some global markers from the system staff
     // This will store it for later use.
     ProcessSystemStaff(score);
@@ -1441,10 +1444,13 @@ function GenerateLine (bobj) {
         return null;
     }
 
-    // We add this spanner to the linked list of active spanners
     bobj._property:Plist = CreateSparseArray();
-    bobj._property:NextActiveSpanner = Self._property:ActiveSpanner;
-    Self._property:ActiveSpanner = bobj;
+
+    // We add this spanner to the linked list of active spanners
+    staffNum = bobj.ParentBar.ParentStaff.StaffNum;
+    activeSpannerByStaff = Self._property:ActiveSpannerByStaff;
+    bobj._property:NextActiveSpanner = activeSpannerByStaff[staffNum];
+    activeSpannerByStaff[staffNum] = bobj;
 
     bobj._property:MeiElement = line;
 

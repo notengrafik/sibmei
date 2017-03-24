@@ -523,10 +523,18 @@ function SpannerAppliesToBobj (spanner, bobj) {
     {
         return false;
     }
-    bobjBarNum = bobj.ParentBar.BarNumber;
-    startBarNum = spanner.ParentBar.BarNumber;
+    bobjBar = bobj.ParentBar;
+    bobjBarNum = bobjBar.BarNumber;
+    startBar = spanner.ParentBar;
+    startBarNum = startBar.BarNumber;
     endBarNum = spanner.EndBarNumber;
     if ((bobjBarNum > endBarNum) or (bobjBarNum < startBarNum)) 
+    {
+        return false;
+    }
+    bobjStaff = bobjBar.ParentStaff;
+    spannerStaff = startBar.ParentStaff;
+    if (bobjStaff.StaffNum != spannerStaff.StaffNum)
     {
         return false;
     }

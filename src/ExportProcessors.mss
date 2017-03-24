@@ -852,52 +852,63 @@ function ProcessActiveSpanners (bobj, meiId) {
         reached the end of the score.
     */
   
-    spanner = Self._property:ActiveSpanner;
-    prevSpanner = null;
     if (bobj != null)
     {
         barNum = bobj.ParentBar.BarNumber;
         pos = bobj.Position;
         bobjVoiceNum = bobj.VoiceNumber;
+        minStaffNum = bobj.ParentBar.ParentStaff.StaffNum;
+        maxStaffNum = minStaffNum;
     }
-    while (spanner != null)
+    else
     {
-        if ((bobj != null) and (SpannerAppliesToBobj(spanner, bobj)))
+        minStaffNum = 1;
+        maxStaffNum = Sibelius.ActiveScore.StaffCount;
+    }
+    for staffNum = minStaffNum to (maxStaffNum + 1)
+    {
+        prevSpanner = null;
+        activeSpannerByStaff = Self._property:ActiveSpannerByStaff;
+        spanner = activeSpannerByStaff[staffNum];
+        while (spanner != null)
         {
-            plist = spanner._property:Plist;
-            plist.Push('#' & meiId);
-            prevSpanner = spanner;
-        }
-        else
-        {
-            // We went beyond the point where this spanner ends, so...
-            //  * add all start/end information (no new info coming beyond this point)
-            element = spanner._property:MeiElement;
-            plist = spanner._property:Plist;
-
-            AddBarObjectInfoToElement(spanner, element);
-            if (spanner.Duration > 0)
+            if ((bobj != null) and (SpannerAppliesToBobj(spanner, bobj)))
             {
-                libmei.AddAttribute(element, 'dur.ges', spanner.Duration & 'p');
-            }
-            libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(spanner));
-            libmei.AddAttribute(element, 'plist', plist.Join(' '));
-            if ((spanner.VoiceNumber != 0) and (plist.Length > 0))
-            {
-                libmei.AddAttribute(element, 'endid', plist[plist.Length - 1]);
-                libmei.AddAttribute(element, 'layer', spanner.VoiceNumber);
-            }
-
-            //  * remove it from the linked list of active spanners
-            if (prevSpanner != null)
-            {
-                prevSpanner._property:NextActiveSpanner = spanner._property:NextActiveSpanner;
+                plist = spanner._property:Plist;
+                plist.Push('#' & meiId);
+                prevSpanner = spanner;
             }
             else
             {
-                Self._property:ActiveSpanner = spanner._property:NextActiveSpanner;
+                // We went beyond the point where this spanner ends, so...
+                //  * add all start/end information (no new info coming beyond this point)
+                element = spanner._property:MeiElement;
+                plist = spanner._property:Plist;
+
+                AddBarObjectInfoToElement(spanner, element);
+                if (spanner.Duration > 0)
+                {
+                    libmei.AddAttribute(element, 'dur.ges', spanner.Duration & 'p');
+                }
+                libmei.AddAttribute(element, 'tstamp2', ConvertPositionWithDurationToTimestamp(spanner));
+                libmei.AddAttribute(element, 'plist', plist.Join(' '));
+                if ((spanner.VoiceNumber != 0) and (plist.Length > 0))
+                {
+                    libmei.AddAttribute(element, 'endid', plist[plist.Length - 1]);
+                    libmei.AddAttribute(element, 'layer', spanner.VoiceNumber);
+                }
+
+                //  * remove it from the linked list of active spanners
+                if (prevSpanner != null)
+                {
+                    prevSpanner._property:NextActiveSpanner = spanner._property:NextActiveSpanner;
+                }
+                else
+                {
+                    activeSpannerByStaff[staffNum] = spanner._property:NextActiveSpanner;
+                }
             }
+            spanner = spanner._property:NextActiveSpanner;
         }
-        spanner = spanner._property:NextActiveSpanner;
     }
 }  //$end
