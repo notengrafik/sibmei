@@ -141,7 +141,7 @@ function GetNoteObjectAtPosition (bobj) {
 function AddBarObjectInfoToElement (bobj, element) {
     //$module(Utilities.mss)
     /*
-        adds timing and position info (startids, endids, tstamps, etc.) to an element
+        adds timing and position info (startids, endids, tstamps, etc.) to an element.
         This info is mostly derived from the base BarObject class.
     */
     voicenum = bobj.VoiceNumber;
@@ -158,7 +158,7 @@ function AddBarObjectInfoToElement (bobj, element) {
     libmei.AddAttribute(element, 'tstamp', ConvertPositionToTimestamp(bobj.Position, bar));
     libmei.AddAttribute(element, 'staff', bar.ParentStaff.StaffNum);
     libmei.AddAttribute(element, 'layer', voicenum);
-    
+
     startNote = GetNoteObjectAtPosition(bobj);
     if (startNote != null)
     {
@@ -584,14 +584,19 @@ function NormalizedEndPosition (bobj) {
       When spanners like octava lines are spanning until the end of a 
       measure, they by default get their EndBarNumber set to the next 
       bar and EndPosition set to 0.  However, if they end at the end of
-      the last bar, EndBarNumber is not set to 'last bar + 1', it's set
-      to the last bar while EndPosition is still 0.
-  
-      This means, the spanner appears to be ending sooner than it
-      actually does. In this case, EndBarNumber and EndPosition are not
-      sufficient to distinguish whether the spanner ends at position 0 or
-      position  1024 (in case of 4/4) of the last bar. We also need to 
-      check Duration.
+      the last bar, EndBarNumber is set to this last bar and 
+      EndPosition is set to 0, i.e. it looks as if it ended at the
+      beginning, not the end, of the last measure.
+
+      To tell apart whether a spanner ends at the beginning or the end
+      of the last measure, we also need to take into account Duration.
+      If Duration indicates that the spanner continues to the end of
+      the measure, we return the Length of the measure as EndPosition,
+      e.g. 1024 in 4/4 time. Sibelius would never return this value
+      (it would use values from 0 to 1023), but this value is very
+      sensible when calculating a @tstamp2 in MEI. (1024 in 4/4 would
+      translate to the 5th beat, which in MEI means attachment to the
+      ending barline.)
     */
     endPosition = bobj.EndPosition;
     if (endPosition = 0)
