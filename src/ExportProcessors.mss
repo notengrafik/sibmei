@@ -87,6 +87,17 @@ function ProcessTuplet (noteRest, meielement, layer) {
     {
         return null;
     }
+    
+    if (noteRest.GraceNote)
+    {
+        // Sibelius encodes grace notes happening before the first actual tuplet note
+        // as part of the tuplet, but we want to put them before the tuplet element.
+        prevNoteRest = PrevNormalOrGrace(noteRest, false);
+        if (not TupletsEqual(noteRest.ParentTupletIfAny, prevNoteRest.ParentTupletIfAny))
+        {
+            return null;
+        }
+    }
 
     /*
        We encode inner tuplets of nested tuplet structures as <tupletSpan>s.

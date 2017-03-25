@@ -256,10 +256,22 @@ function GetMeiTupletDepth (layer) {
     //$module(Utilities.mss)
     depth = 0;
     tuplet = layer._property:ActiveMeiTuplet;
-    while (tuplet)
+    while (tuplet != null)
     {
         depth = depth + 1;
         tuplet = tuplet._property:ParentTuplet;
+    }
+    return depth;
+}  //$end
+
+function GetSibTupletDepth (noteRest) {
+    //$module(Utilities.mss)
+    depth = 0;
+    tuplet = noteRest.ParentTupletIfAny;
+    while (tuplet != null)
+    {
+        depth = depth + 1;
+        tuplet = tuplet.ParentTupletIfAny;
     }
     return depth;
 }  //$end
@@ -348,9 +360,9 @@ function NormalizedBeamProp (noteRest) {
 function NextNormalOrGrace (noteRest, grace) {
     //$module(Utilities.mss)
     /*
-        When given a 'normal' NoteRest, this function returns the next 'normal' NoteRest
+        When `grace` is false, this function returns the next 'normal' NoteRest
         in the same voice.
-        When given a grace NoteRest, this function returns the immediately adjacent 
+        When `grace` is true, this function returns the immediately adjacent 
         following grace NoteRest, if existant.
         This function is basically a duplicate of PrevNormalOrGrace() with 
         'Previous' replaced by 'Next'.
@@ -542,4 +554,77 @@ function NormalizedEndPosition (bobj) {
         }
     }
     return endPosition;
+}  //$end
+
+function AppendToLayer (meielement, l, beam, tuplet) {
+    //$module(Utilities.mss)
+    if (beam != null)
+    {
+        libmei.AddChild(beam, meielement);
+
+        if (tuplet != null)
+        {
+            if (beam._parent = l._id)
+            {
+                /*
+                   If the beam has been previously added to the layer but now
+                   finds itself part of a tuplet, shift the tuplet to a tupletSpan. This
+                   effectively just replaces the active tuplet with a tupletSpan element
+                */
+                if (tuplet.name != 'tupletSpan')
+                {
+                    ShiftTupletToTupletSpan(tuplet, l);
+                }
+            }
+            else
+            {
+                if (beam._parent != tuplet._id)
+                {
+                    libmei.AddChild(tuplet, beam);
+                }
+
+                if (tuplet._parent != l._id)
+                {
+                    libmei.AddChild(l, tuplet);
+                }
+            }
+        }
+        else
+        {
+            parent = beam._property:ParentBeam;
+            if (parent = null)
+            {
+                parent = l;
+            }
+            if (beam._parent != parent._id)
+            {
+                libmei.AddChild(parent, beam);
+            }
+        }
+    }
+    else
+    {
+        if (tuplet != null)
+        {
+            tname = libmei.GetName(tuplet);
+
+            if (tname != 'tupletSpan')
+            {
+                libmei.AddChild(tuplet, meielement);
+            }
+            else
+            {
+                libmei.AddChild(l, meielement);
+            }
+
+            if (tuplet._parent != l._id)
+            {
+                libmei.AddChild(l, tuplet);
+            }
+        }
+        else
+        {
+            libmei.AddChild(l, meielement);
+        }
+    }
 }  //$end
