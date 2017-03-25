@@ -515,7 +515,8 @@ function ProcessSymbol (sobj) {
         case ('32')
         {
             // trill
-            trill = GenerateTrill(sobj);
+            trill = libmei.Trill();
+            trill = AddBarObjectInfoToElement(sobj, trill);
             mlines = Self._property:MeasureObjects;
             mlines.Push(trill._id);
         }

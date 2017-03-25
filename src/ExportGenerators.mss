@@ -1404,8 +1404,6 @@ function GenerateLine (bobj) {
         case ('Trill')
         {
             line = GenerateTrill(bobj);
-            // NB: Return here since the trill already has its properties set.
-            return line;
         }
         case ('Line')
         {
@@ -1455,26 +1453,6 @@ function GenerateLine (bobj) {
     bobj._property:MeiElement = line;
 
     return line;
-}  //$end
-
-
-function GenerateTrill (bobj) {
-    //$module(ExportGenerators.mss)
-    /* There are two types of trills in Sibelius: A line object and a
-        symbol object. This method normalizes both of these.
-    */
-    trill = libmei.Trill();
-    bar = bobj.ParentBar;
-    obj = GetNoteObjectAtPosition(bobj);
-
-    if (obj != null)
-    {
-        libmei.AddAttribute(trill, 'startid', '#' & obj._id);
-    }
-
-    trill = AddBarObjectInfoToElement(bobj, trill);
-
-    return trill;
 }  //$end
 
 
