@@ -1404,6 +1404,7 @@ function GenerateLine (bobj) {
         case ('Trill')
         {
             line = libmei.Trill();
+            libmei.AddAttribute(line, 'extender', 'true');
         }
         case ('Line')
         {

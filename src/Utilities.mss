@@ -495,11 +495,11 @@ function SpannerAppliesToBobj (spanner, bobj) {
 
         if (appliesToEndPosition)
         {
-            return bobjPos < endPos;
+            return bobjPos <= endPos;
         }
         else
         {
-            return bobjPos <= endPos;
+            return bobjPos < endPos;
         }
     }
     return true;
