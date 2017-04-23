@@ -653,6 +653,10 @@ function GenerateLayers (staffnum, measurenum) {
             {
                 mobj = ConvertText(bobj);
             }
+            case('Comment')
+            {
+                mobj = GenerateComment(bobj);
+            }
         }
 
         if (mobj != null)
@@ -1561,6 +1565,17 @@ function GenerateChordSymbol (bobj) {
     libmei.SetText(harm, bobj.ChordNameAsPlainText);
 
     return harm;
+}  //$end
+
+function GenerateComment (bobj) {
+    //$module(ExportGenerators.mss)
+    annot = libmei.Annot();
+
+    libmei.AddAttribute(annot, 'staff', bobj.ParentBar.ParentStaff.StaffNum);
+    libmei.AddAttribute(annot, 'tstamp', ConvertPositionToTimestamp(bobj.Position, bobj.ParentBar));
+    libmei.SetText(annot, lstrip(bobj.Text));
+    
+    return annot;
 }  //$end
 
 function GenerateFormattedString (bobj) {
