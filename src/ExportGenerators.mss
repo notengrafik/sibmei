@@ -487,6 +487,8 @@ function GenerateLayers (staffnum, measurenum) {
     this_staff = score.NthStaff(staffnum);
     bar = this_staff[measurenum];
 
+    mobjs = Self._property:MeasureObjects;
+
     for each bobj in bar
     {
         voicenumber = bobj.VoiceNumber;
@@ -521,7 +523,6 @@ function GenerateLayers (staffnum, measurenum) {
 
         obj = null;
         mobj = null;
-        chordsym = null;
         parent = null;
         beam = null;
         tuplet = null;
@@ -661,68 +662,91 @@ function GenerateLayers (staffnum, measurenum) {
                     libmei.AddChild(l, brest);
                 }
             }
-            case('GuitarFrame')
-            {
-                chordsym = GenerateChordSymbol(bobj);
-            }
-            case('Slur')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('CrescendoLine')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('DiminuendoLine')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('OctavaLine')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('GlissandoLine')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('Trill')
-            {
-                mobj = GenerateLine(bobj);
-            }
+        }
+    }
+
+    for each bobj in bar
+    {
+        obj = null;
+        mobj = null;
+        chordsym = null;
+
+        switch (bobj.Type)
+        {
+          case('GuitarFrame')
+          {
+              chordsym = GenerateChordSymbol(bobj);
+          }
+          case('Slur')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('CrescendoLine')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('DiminuendoLine')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('OctavaLine')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('GlissandoLine')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('Trill')
+          {
+              mobj = GenerateLine(bobj);
+          }
             case('ArpeggioLine')
             {
                 mobj = GenerateArpeggio(bobj);
             }
-            case('RepeatTimeLine')
-            {
-                RegisterVolta(bobj);
-            }
-            case('Line')
-            {
-                mobj = GenerateLine(bobj);
-            }
-            case('Text')
-            {
-                mobj = ConvertText(bobj);
-            }
-        }
+          case('RepeatTimeLine')
+          {
+              RegisterVolta(bobj);
+          }
+          case('Line')
+          {
+              mobj = GenerateLine(bobj);
+          }
+          case('Text')
+          {
+              mobj = ConvertText(bobj);
+              if (mobj != null)
+              {
+                  //Try to get note at position of bracket and put id
+                  obj = GetNoteObjectAtPosition(bobj);
 
-        if (mobj != null)
-        {
+                  if (obj != null)
+                  {
+                      libmei.AddAttribute(text, 'startid', '#' & obj._id);
+                  }
+              }
+          }
+      }
+
+      if (mobj != null)
+      {
             mobjs = Self._property:MeasureObjects;
             mobjs.Push(mobj._id);
             Self._property:MeasureObjects = mobjs;
-        }
+      }
 
-        // add chord symbols to the measure objects
-        // so that they get added to the measure later in the processing cycle.
-        if (chordsym != null)
-        {
+      // add chord symbols to the measure objects
+      // so that they get added to the measure later in the processing cycle.
+      if (chordsym != null)
+      {
             mlines = Self._property:MeasureObjects;
             mlines.Push(chordsym._id);
             Self._property:MeasureObjects = mlines;
-        }
+      }
     }
+
+    Self._property:MeasureObjects = mobjs;
 
     for each LyricItem lobj in bar
     {
