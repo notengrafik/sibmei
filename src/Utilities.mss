@@ -350,7 +350,7 @@ function AddBarObjectInfoToElement (bobj, element) {
 
     if (bobj.Dy > 0)
     {
-        libmei.AddAttribute(element, 'vo', ConvertOffsetsToMillimeters(bobj.Dy));
+        libmei.AddAttribute(element, 'vo', ConvertOffsetsToMEI(bobj.Dy));
     }
 
     return element;
