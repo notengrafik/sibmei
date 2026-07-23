@@ -206,8 +206,6 @@ function BuildNoteRestParentsByVoiceAndPosition (bar) {
                     beamInfo = CreateDictionary(
                         'element', CreateElement('beam'),
                         'parent', parentsInVoice.layerInfo,
-                        // TODO: We don't really need an array of all the notes,
-                        // it suffices to have the first and the last one
                         'noteRests', CreateSparseArray(noteRest),
                         'position', noteRest.Position,
                         // This value will be updated when iteration reaches
