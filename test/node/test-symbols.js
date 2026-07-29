@@ -46,7 +46,7 @@ describe("Symbols", function() {
         });
     });
     describe("System attached symbols", function() {
-        it("22 articulations were created", function () {
+        it("creates a caesura element", function () {
             const caesura = xpath.evaluateXPath('//*:caesura', meiSymbols);
             assert.strictEqual(caesura.tagName, "caesura");
         });
