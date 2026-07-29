@@ -74,6 +74,12 @@ function InitSymbolHandlers () {
     ));
 
     RegisterSymbolHandlers('Index', 'ControlEventTemplateHandler', CreateDictionary(
+        1, @Element('repeatMark', @Attrs('func', 'segno')),
+        2, @Element('repeatMark', @Attrs('func', 'coda')),
+        // Variant of segno symbol (more upright)
+        13, @Element('repeatMark', @Attrs('func', 'segno')),
+        // Variant of coda symbol (cross lines end in perpendicular bars)
+        14, @Element('repeatMark', @Attrs('func', 'coda')),
         // trill
         32, @Element('trill'),
         // inverted mordent
@@ -99,7 +105,11 @@ function InitSymbolHandlers () {
         // round fermata below
         237, @Element('fermata', @Attrs('shape', 'curved', 'form', 'inv')),
         // triangular fermata below
-        238, @Element('fermata', @Attrs('shape', 'angular', 'form', 'inv'))
+        238, @Element('fermata', @Attrs('shape', 'angular', 'form', 'inv')),
+        // double slash caesura
+        249, @Element('caesura', @Attrs('glyph.auth', 'smufl', 'glyph.num', 'U+E4D1')),
+        // thick double slash caesura
+        250, @Element('caesura', @Attrs('glyph.auth', 'smufl', 'glyph.num', 'U+E4D2'))
     ));
 }//$end
 
