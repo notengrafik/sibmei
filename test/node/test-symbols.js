@@ -45,4 +45,10 @@ describe("Symbols", function() {
             utils.assertElsHasAttr(artics, [10, 11, 12, 13, 14, 15], 'place');
         });
     });
+    describe("System attached symbols", function() {
+        it("creates a caesura element", function () {
+            const caesura = xpath.evaluateXPath('//*:caesura', meiSymbols);
+            assert.strictEqual(caesura.tagName, "caesura");
+        });
+    });
 });

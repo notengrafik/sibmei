@@ -355,11 +355,6 @@ function GenerateMeasure (num) {
         m.children.Push(tie);
     }
 
-    for each mobj in MeasureObjects
-    {
-        m.children.Push(mobj);
-    }
-
     for each bobj in sysBar
     {
         switch (bobj.Type)
@@ -379,12 +374,12 @@ function GenerateMeasure (num) {
             {
                 if (bobj.OnNthBlankPage = 0)
                 {
-                    text = HandleStyle(TextHandlers, bobj);
-                    if (text != null)
-                    {
-                        AddChild(m, text);
-                    }
+                    HandleStyle(TextHandlers, bobj);
                 }
+            }
+            case ('SystemSymbolItem')
+            {
+                HandleSymbol(bobj);
             }
             case ('RepeatTimeLine')
             {
@@ -402,6 +397,11 @@ function GenerateMeasure (num) {
                 Log('is object? ' & IsObject(bobj));
             }
         }
+    }
+
+    for each mobj in MeasureObjects
+    {
+        m.children.Push(mobj);
     }
 
     if (null != ActiveVolta and ActiveVolta.endBarNumber < num)
