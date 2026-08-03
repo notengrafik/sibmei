@@ -30,7 +30,7 @@ Extensions are regular Sibelius plugins written in ManuScript. When running Sibm
       // We want to add support for Text objects matching
       //   textObj.StyleAsText = 'My text'
       // Sibmei will append the generated element to the measure element.
-      'My text', @Element('AnchoredText', null, api.FormattedText)
+      'My text', @Element('anchoredText', null, api.FormattedText)
     ), Self);
   }"
 }
