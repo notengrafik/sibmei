@@ -94,46 +94,27 @@ function GenerateMEIHeader () {
 }  //$end
 
 function GenerateApplicationInfo () {
-    //$module(ExportGenerators.mss)
-
-    appI = CreateElement('appInfo');
-
-    applic = CreateElement('application');
-    SetId(applic, 'sibelius');
-    AddChild(appI, applic);
-    AddAttribute(applic, 'version', Sibelius.ProgramVersion);
     isodate = ConvertDate(Sibelius.CurrentDate);
-    AddAttribute(applic, 'isodate', isodate);
-    osname = CreateElement('name');
-    SetText(osname, Sibelius.OSVersionString);
-    AddAttribute(osname, 'type', 'operating-system');
-    AddChild(applic, osname);
-
-    plgapp = CreateElement('application');
-    plgname = CreateElement('name');
-    SetText(plgname, PluginName & ' (' & PluginVersion & ')');
-    AddAttribute(plgapp, 'type', 'plugin');
-    AddAttribute(plgapp, 'version', PluginVersion);
-    SetId(plgapp, 'sibmei');
-    AddChild(plgapp, plgname);
-    AddChild(appI, plgapp);
+    appInfo = @Element('appInfo', null,
+        @Element('application', @Attrs('xml:id', 'sibelius', 'isodate', isodate, 'version', Sibelius.ProgramVersion),
+            @Element('name', null, 'Sibelius Ultimate')
+        ),
+        @Element('application', @Attrs('xml:id', 'sibmei', 'type', 'plugin', 'version', PluginVersion),
+            @Element('name', null, PluginName & '')
+        )
+    );
 
     if (Self._property:ChosenExtensions)
     {
         for each Pair ext in Self._property:ChosenExtensions
         {
-            extapp = CreateElement('application');
-            SetId(extapp, ext.Name);
-            AddAttribute(extapp, 'type', 'extension');
-            extName = CreateElement('name');
-            SetText(extName, ext.Value);
-            AddChild(extapp, extName);
-            AddChild(appI,extapp);
+            appInfo.Push(@Element('application', @Attrs('xml:id', ext.Name, 'type', 'extension'),
+                @Element('name', null, ext.Value)
+            ));
         }
     }
 
-    return appI;
-
+    return MeiFactory(appInfo, null);
 }   //$end
 
 function GenerateMEIMusic () {
