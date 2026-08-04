@@ -95,11 +95,16 @@ function GenerateMEIHeader () {
 
 function GenerateApplicationInfo () {
     isodate = ConvertDate(Sibelius.CurrentDate);
+    // `OSVersionString` is partly bogus, but the first part ('Windows'/'Mac')
+    // seems reliable
+    splitOsVersionString = SplitString(Sibelius.OSVersionString, ' ');
+    osType = splitOsVersionString[0] & '';
     appInfo = @Element('appInfo', null,
-        @Element('application', @Attrs('xml:id', 'sibelius', 'isodate', isodate, 'version', Sibelius.ProgramVersion),
-            @Element('name', null, 'Sibelius Ultimate')
+        @Element('application', @Attrs('type', 'music-notation-software', 'version', Sibelius.ProgramVersion),
+            @Element('name', @Attrs('type', 'application'), 'Sibelius'),
+            @Element('name', @Attrs('type', 'operating-system'), osType)
         ),
-        @Element('application', @Attrs('xml:id', 'sibmei', 'type', 'plugin', 'version', PluginVersion),
+        @Element('application', @Attrs('type', 'export-plugin', 'version', PluginVersion, 'isodate', isodate),
             @Element('name', null, PluginName & '')
         )
     );
@@ -108,7 +113,13 @@ function GenerateApplicationInfo () {
     {
         for each Pair ext in Self._property:ChosenExtensions
         {
-            appInfo.Push(@Element('application', @Attrs('xml:id', ext.Name, 'type', 'extension'),
+            extensionInfo = ExtensionsInfo[ext.Name];
+            attrs = @Attrs('label', ext.Name, 'type', 'sibmei-extension');
+            if ('' != extensionInfo['pluginVersion'])
+            {
+                attrs['version'] = extensionInfo.pluginVersion;
+            }
+            appInfo.Push(@Element('application', attrs,
                 @Element('name', null, ext.Value)
             ));
         }

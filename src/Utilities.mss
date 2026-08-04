@@ -741,14 +741,7 @@ export function MeiFactory (data, bobj) {
     {
         for each Name attName in attributes
         {
-            if (attName = 'xml:id')
-            {
-                element._id = attributes[attName];
-            }
-            else
-            {
-                AddAttribute(element, attName, attributes[attName]);
-            }
+            AddAttribute(element, attName, attributes[attName]);
         }
     }
 

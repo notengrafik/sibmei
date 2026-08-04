@@ -55,6 +55,10 @@ Register your symbol, text, line and lyrics Handlers in this function using the 
 
 ### Optional fields
 
+### `PluginVersion`
+
+If present, this value will be used as the `@version` attribute in the extension's `<appInfo>` element.
+
 ### `CustomSchemaLocation`
 
 By default, Sibmei writes schema validation processing instructions with the URL of the mei-CMN schema. A custom schema location can be declared as `CustomSchemaLocation`. If this field is `noSchema`, Sibmei will not write the validation processing instructions.
