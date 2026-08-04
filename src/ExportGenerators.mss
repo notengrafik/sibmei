@@ -104,7 +104,14 @@ function GenerateApplicationInfo () {
             @Element('name', @Attrs('type', 'application'), 'Sibelius'),
             @Element('name', @Attrs('type', 'operating-system'), osType)
         ),
-        @Element('application', @Attrs('type', 'export-plugin', 'version', PluginVersion, 'isodate', isodate),
+        @Element(
+            'application',
+            @Attrs(
+                'type', 'export-plugin',
+                'label', MainPlgBaseName & '',
+                'version', PluginVersion & '',
+                'isodate', isodate
+            ),
             @Element('name', null, PluginName & '')
         )
     );
