@@ -1,18 +1,20 @@
-function RegisterAvailableExtensions (extensionsInfo, pluginList) {
-    // Looks for existing extensions and registers in global variable
-    // `AvailableExtensions`.
-    // Keys of this Hash map are the names by which the extension plugins can
-    // be referenced in ManuScript, e.g. like `@name.SibmeiExtensionAPIVersion`.
-    // Values are the full names that are displayed to the user.
+function RegisterAvailableExtensions (pluginList) {
+    // Looks for existing extensions and registers them in global variables
+    // `AvailableExtensions` and `ExtensionsInfo`.
     //
-    // `extensionsInfo` must be an empty Dictionary. For each extension plugin,
-    // a sub-Dictionary with some information about the extension plugin is
-    // registered under its PLG name as key. Fields in the sub-Dictionary are:
-    //   * `plgName`: Same value that is used as the key in `extensionsInfo`
+    // Keys of both the TreeNode Hash map and the Dictionary `ExtensionsInfo`
+    // are the names by which the extension plugins can be referenced in
+    // ManuScript, e.g. like `@name.SibmeiExtensionAPIVersion`.
+    //
+    // Values in `AvailableExtensions` are the full names that are displayed to
+    // the user.
+    //
+    // Values in `ExtensionsInfo` are Dictionaries with the following fields:
+    //   * `plgName`: Same value that is used as the key in `ExtensionsInfo`
     //   * `plugin`: The extension's Plugin object (from Sibelius.Plugins)
     //   * `apiVersion`: The major version number of the used extension API
-    //
-    // `pluginList` is a persistent reference to `Sibelius.Plugins`.
+    //   * `pluginVersion`: Only present if the plugin has a global variable
+    //     `PluginVersion`.
 
     incompatibleExtensionsInfo = CreateSparseArray(
         ExtensionAPIVersion & ' - Current extension API version'
@@ -53,11 +55,16 @@ function RegisterAvailableExtensions (extensionsInfo, pluginList) {
                 }
             }
 
-            extensionsInfo[plgName] = CreateDictionary(
+            extensionInfo = CreateDictionary(
                 'plgName', plgName,
                 'plugin', pluginObject,
                 'apiVersion', extensionSemver[0] + 0
             );
+            ExtensionsInfo[plgName] = extensionInfo;
+            if (pluginObject.DataExists('PluginVersion'))
+            {
+                extensionInfo['pluginVersion'] = @plgName.PluginVersion & '';
+            }
 
             if (null = incompatibilityInfo)
             {
@@ -139,8 +146,8 @@ function InitExtensions (extensions, pluginList) {
     // Returns false if the user aborted the selection of extensions or if there
     // are any errors, otherwise returns true.
 
-    extensionsInfo = CreateDictionary();
-    RegisterAvailableExtensions(extensionsInfo, pluginList);
+    Self._property:ExtensionsInfo = CreateDictionary();
+    RegisterAvailableExtensions(pluginList);
 
     chosenExtensions = CreateDictionary();
     if (null = extensions)
@@ -161,14 +168,14 @@ function InitExtensions (extensions, pluginList) {
 
     for each Name plgName in chosenExtensions
     {
-        if (extensionsInfo[plgName].apiVersion >= 2)
+        if (ExtensionsInfo[plgName].apiVersion >= 2)
         {
             InitGlobalAliases(@plgName);
         }
-        @plgName.InitSibmeiExtension(CreateApiObject(extensionsInfo[plgName]));
+        @plgName.InitSibmeiExtension(CreateApiObject(ExtensionsInfo[plgName]));
     }
 
-    SchemaLocation = GetSchemaLocation(chosenExtensions, extensionsInfo);
+    SchemaLocation = GetSchemaLocation(chosenExtensions);
 
     // Keep chosenExtensions as global variable for encoding <appInfo>
     Self._property:ChosenExtensions = chosenExtensions;
@@ -177,14 +184,14 @@ function InitExtensions (extensions, pluginList) {
 }  //$end
 
 
-function GetSchemaLocation (chosenExtensions, extensionsInfo) {
+function GetSchemaLocation (chosenExtensions) {
     // To detect conflicting schema locations defined by multiple active
     // extensions, collect all of them with info about the extensions that
     // defined them.
     schemaLocations = CreateDictionary();
     for each Name plgName in chosenExtensions
     {
-        if (extensionsInfo[plgName].plugin.DataExists('CustomSchemaLocation'))
+        if (ExtensionsInfo[plgName].plugin.DataExists('CustomSchemaLocation'))
         {
             schemaLocations[@plgName.CustomSchemaLocation] = plgName;
         }

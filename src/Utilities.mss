@@ -725,10 +725,11 @@ function InitFigbassCharMap () {
 export function MeiFactory (data, bobj) {
     // Parameter `data` is a template SparseArray with the following entries:
     //
-    // 0. The capitalized tag name
+    // 0. The tag name
     // 1. A dictionary with attribute names and values
-    // 2., 3., ... Child nodes (optional) as strings (for text nodes) or as
-    //    template SparseArrays (for child elements)
+    // 2., 3., ... Child nodes (optional) as either strings (for text nodes),
+    //    template actions (objects with a `templateAction` property) or
+    //    SparseArrays of the same form as `data`, representing child elements
     //
     // For further documentation, see Extensions.md
 
@@ -756,15 +757,23 @@ export function MeiFactory (data, bobj) {
                 {
                     AppendText(element, childData);
                 }
-                case (null != childData._property:templateAction)
+                case (childData._property:templateAction != null)
                 {
                     childData.templateAction.action(element, bobj);
                 }
-                default
+                case (childData[0] != null)
                 {
-                    // We have a child element
+                    // We have a child element represented by a SparseArray
                     currentChild = MeiFactory(childData, bobj);
                     AddChild(element, currentChild);
+                }
+                default
+                {
+                    // This must be a TreeNode, which could e.g. be a global
+                    // variables from GLOBALS.msd or the result of a
+                    // SplitString() call. These values seem like strings, but
+                    // in fact we're dealing with a quirky type of object.
+                    AppendText(element, childData & '');
                 }
             }
         }

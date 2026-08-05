@@ -94,46 +94,45 @@ function GenerateMEIHeader () {
 }  //$end
 
 function GenerateApplicationInfo () {
-    //$module(ExportGenerators.mss)
-
-    appI = CreateElement('appInfo');
-
-    applic = CreateElement('application');
-    SetId(applic, 'sibelius');
-    AddChild(appI, applic);
-    AddAttribute(applic, 'version', Sibelius.ProgramVersion);
     isodate = ConvertDate(Sibelius.CurrentDate);
-    AddAttribute(applic, 'isodate', isodate);
-    osname = CreateElement('name');
-    SetText(osname, Sibelius.OSVersionString);
-    AddAttribute(osname, 'type', 'operating-system');
-    AddChild(applic, osname);
-
-    plgapp = CreateElement('application');
-    plgname = CreateElement('name');
-    SetText(plgname, PluginName & ' (' & PluginVersion & ')');
-    AddAttribute(plgapp, 'type', 'plugin');
-    AddAttribute(plgapp, 'version', PluginVersion);
-    SetId(plgapp, 'sibmei');
-    AddChild(plgapp, plgname);
-    AddChild(appI, plgapp);
+    // `OSVersionString` is partly bogus, but the first part ('Windows'/'Mac')
+    // seems reliable
+    splitOsVersionString = SplitString(Sibelius.OSVersionString, ' ');
+    osType = splitOsVersionString[0] & '';
+    appInfo = @Element('appInfo', null,
+        @Element('application', @Attrs('type', 'music-notation-software', 'version', Sibelius.ProgramVersion),
+            @Element('name', @Attrs('type', 'application'), 'Sibelius'),
+            @Element('name', @Attrs('type', 'operating-system'), osType)
+        ),
+        @Element(
+            'application',
+            @Attrs(
+                'type', 'export-plugin',
+                'label', MainPlgBaseName & '',
+                'version', PluginVersion & '',
+                'isodate', isodate
+            ),
+            @Element('name', null, PluginName & '')
+        )
+    );
 
     if (Self._property:ChosenExtensions)
     {
         for each Pair ext in Self._property:ChosenExtensions
         {
-            extapp = CreateElement('application');
-            SetId(extapp, ext.Name);
-            AddAttribute(extapp, 'type', 'extension');
-            extName = CreateElement('name');
-            SetText(extName, ext.Value);
-            AddChild(extapp, extName);
-            AddChild(appI,extapp);
+            extensionInfo = ExtensionsInfo[ext.Name];
+            attrs = @Attrs('label', ext.Name, 'type', 'sibmei-extension');
+            if ('' != extensionInfo['pluginVersion'])
+            {
+                attrs['version'] = extensionInfo.pluginVersion;
+            }
+            appInfo.Push(@Element('application', attrs,
+                @Element('name', null, ext.Value)
+            ));
         }
     }
 
-    return appI;
-
+    return MeiFactory(appInfo, null);
 }   //$end
 
 function GenerateMEIMusic () {
