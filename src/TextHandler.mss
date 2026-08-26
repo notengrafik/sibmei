@@ -26,6 +26,18 @@ function InitTextHandlers() {
     RegisterTextHandlers('StyleId', 'FiguredBassTextHandler', @Attrs(
         'text.staff.space.figuredbass', null
     ));
+
+    RegisterTextHandlers('StyleId', 'TemplateHandler', CreateDictionary(
+        'text.blankpage.boxed', @Element('p', null, @Element('rend', @Attrs('rend', 'box'), FormattedText)),
+        'text.blankpage.composer', @Element('p', null, @Element('persName', @Attrs('role', 'composer'), FormattedText)),
+        'text.blankpage.dedication', @Element('div', @Attrs('type', 'dedication'), FormattedText),
+        'text.blankpage.instrumentname', @Element('div', @Attrs('type', 'instrumentname'), FormattedText),
+        'text.blankpage.plain', @Element('div',  null, FormattedText),
+        'text.blankpage.plain.centered', @Element('p', null, @Element('rend', @Attrs('halign', 'center'), FormattedText)),
+        'text.blankpage.plain.right', @Element('p', null, @Element('rend', @Attrs('halign', 'right'), FormattedText)),
+        'text.blankpage.subtitle', @Element('head', null, @Element('title', @Attrs('type', 'subordinate'), FormattedText)),
+        'text.blankpage.title', @Element('head', null, @Element('title', null, FormattedText))
+    ));
 }  //$end
 
 

@@ -155,8 +155,6 @@ function GenerateMEIMusic () {
 
     music = CreateElement('music');
 
-    ProcessFrontMatter(music);
-
     body = CreateElement('body');
     AddChild(music, body);
     Self._property:BodyElement = body;
@@ -190,6 +188,8 @@ function GenerateMEIMusic () {
         section = Self._property:SectionElement;
 
         m = GenerateMeasure(j);
+
+        ProcessBlankPageContent(m['precedingBlankPages'], section);
 
         if (Self._property:PageBreak != null)
         {
@@ -255,6 +255,8 @@ function GenerateMEIMusic () {
         {
             AddChild(section, m);
         }
+
+        ProcessBlankPageContent(m['followingBlankPages'], section);
     }
 
     return music;
@@ -374,6 +376,22 @@ function GenerateMeasure (num) {
                 if (bobj.OnNthBlankPage = 0)
                 {
                     HandleStyle(TextHandlers, bobj);
+                }
+                else
+                {
+                    if (bobj.OnNthBlankPage < 0)
+                    {
+                        blankPages = 'precedingBlankPages';
+                    }
+                    else
+                    {
+                        blankPages = 'followingBlankPages';
+                    }
+                    if (null = m[blankPages])
+                    {
+                        m[blankPages] = CreateSparseArray();
+                    }
+                    m[blankPages].Push(bobj);
                 }
             }
             case ('SystemSymbolItem')

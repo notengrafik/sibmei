@@ -133,6 +133,11 @@ function ControlEventTemplateHandler (this, bobj) {
 }  //$end
 
 
+function TemplateHandler (this, bobj) {
+    return MeiFactory(this.template, bobj);
+} //$end
+
+
 function HandleStyle (handlers, bobj) {
     // bobj must be an object with StyleId and StyleAsText properties (i.e. a
     // Line or Text object). A matching handler for the style is looked up and
@@ -147,3 +152,27 @@ function HandleStyle (handlers, bobj) {
         return handler.HandleObject(bobj);
     }
 } //$end
+
+
+function HandleBlankPageItem (m, bobj) {
+    // Only text and graphics may occur on blank pages, but we can't retrieve
+    // useful information about graphics, so bobj will always a SystemTextItem
+    if (bobj.OnNthBlankPage < 0)
+    {
+        if (bobj.ParentBar.BarNumber > 1)
+        {
+            // TODO: Rephrase. We don't classify this as 'front matter' any more
+            RegisterWarning(bobj, 'Front matter is only expected at bar 1', 'Please report the issue at https://github.com/music-encoding/sibmei/issues/new and attach file ' & bobj.ParentBar.ParentStaff.ParentScore.FileName);
+        }
+        blankPages = 'precedingBlankPages';
+    }
+    else
+    {
+        blankPages = 'followingBlankPages';
+    }
+    if (null = m[blankPages])
+    {
+        m[blankPages] = CreateSparseArray();
+    }
+    m[blankPages].Push(bobj);
+}  //$end

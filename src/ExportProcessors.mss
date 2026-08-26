@@ -19,56 +19,39 @@ function ProcessScore () {
 }  //$end
 
 
-function ProcessFrontMatter (musicEl) {
-    if (SystemStaff.BarCount = 0)
+function ProcessBlankPageContent (bobjs, parent) {
+    // bobjs: SparseArray() of objects that are attached to the preceding or
+    //   following blank pages of a specific Bar.
+    // parent: MEI element that <pb> and <div> elements containing all the
+    //   elements of a blank page should be attached to.
+
+    if (null = bobjs)
     {
         return '';
     }
 
-    frontmatter = CreateDictionary();
-    bar = SystemStaff.NthBar(1);
+    currentPnum = -1;
+    div = null;
 
-    for each SystemTextItem bobj in bar
+    for each bobj in bobjs
     {
-        if (bobj.OnNthBlankPage < 0)
+        pnum = (bobj.ParentBar.OnNthPage + bobj.OnNthBlankPage) + 1;
+        if (pnum > currentPnum or null = div)
         {
-            pnum = (bar.OnNthPage + bobj.OnNthBlankPage) + 1;
-
-            if (frontmatter.PropertyExists(pnum) = false)
-            {
-                pb = CreateElement('pb');
-                AddAttribute(pb, 'n', pnum);
-                frontmatter[pnum] = CreateSparseArray(pb);
-            }
-
-            pElement = AddFormattedText(null, CreateElement('p'), bobj);
-            divElement = CreateElement('div');
-            AddChild(divElement, pElement);
-            frontmatter[pnum].Push(divElement);
+            currentPnum = pnum;
+            pb = CreateElement('pb');
+            AddAttribute(pb, 'n', pnum);
+            AddChild(parent, pb);
+            div = CreateElement('div');
+            AddChild(parent, div);
+        }
+        element = HandleStyle(TextHandlers, bobj);
+        if (null != element)
+        {
+            AddChild(div, element);
         }
     }
-
-    frontpages = frontmatter.GetPropertyNames();
-
-    if (frontpages.Length > 0)
-    {
-        // sort the front pages
-        // Log('front: ' & frontmatter);
-        sorted_front = utils.SortArray(frontpages, false);
-        frontEl = CreateElement('front');
-        for each pnum in sorted_front
-        {
-            pgels = frontmatter[pnum];
-
-            for each el in pgels
-            {
-                AddChild(frontEl, el);
-            }
-        }
-
-        AddChild(musicEl, frontEl);
-    }
-}  //$end
+} //$end
 
 
 function ProcessEndingLines (bar) {
