@@ -1,8 +1,9 @@
 function InitHandlers () {
     Self._property:IsHandlerMethodThatExtensionsMayUse = CreateDictionary(
         'ControlEventTemplateHandler', true,
+        'LyricTemplateHandler', true,
         'ModifierTemplateHandler', true,
-        'LyricTemplateHandler', true
+        'TemplateHandler', true
     );
 
     InitSymbolHandlers();
