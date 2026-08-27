@@ -19,36 +19,117 @@ function ProcessScore () {
 }  //$end
 
 
-function ProcessBlankPageContent (bobjs, parent) {
-    // bobjs: SparseArray() of objects that are attached to the preceding or
-    //   following blank pages of a specific Bar.
-    // parent: MEI element that <pb> and <div> elements containing all the
-    //   elements of a blank page should be attached to.
-
-    if (null = bobjs)
+function ProcessPageAndSystemBreaks (bar) {
+    if (bar.NthBarInSystem > 0)
     {
+        // We're only interested in bars that start a new system
         return '';
     }
 
-    currentPnum = -1;
-    div = null;
-
-    for each bobj in bobjs
+    barNum = bar.BarNumber;
+    if (barNum > 1)
     {
-        pnum = (bobj.ParentBar.OnNthPage + bobj.OnNthBlankPage) + 1;
-        if (pnum > currentPnum or null = div)
+        precedingBar = SystemStaff.NthBar(barNum - 1);
+        pageNumOfPrecdingBar = precedingBar.OnNthPage + 1;
+    }
+    else
+    {
+        precedingBar = null;
+        pageNumOfPrecdingBar = -1;
+    }
+
+    if (null != precedingBar and precedingBar.NumBlankPages > 0)
+    {
+        ProcessBlankPages(
+            precedingBar,
+            pageNumOfPrecdingBar + 1,
+            pageNumOfPrecdingBar + precedingBar.NumBlankPages
+        );
+    }
+
+    pageNumOfCurrentBar = bar.OnNthPage + 1;
+
+    if (bar.NumBlankPagesBefore != 0)
+    {
+        ProcessBlankPages(
+            bar,
+            pageNumOfCurrentBar - bar.NumBlankPagesBefore,
+            pageNumOfCurrentBar - 1
+        );
+    }
+
+    if (pageNumOfPrecdingBar = pageNumOfCurrentBar)
+    {
+        // Continuing on the same page, only generate system break
+        GenerateSystemAndPageBreaks(true, '');
+    }
+    else
+    {
+        // Start new page with page and system breaks
+        GenerateSystemAndPageBreaks(true, pageNumOfCurrentBar);
+    }
+} //$end
+
+
+function ProcessBlankPages (bar, startPageNum, endPageNum) {
+    referencePageNumber = bar.OnNthPage + 1;
+    bobjsByPageNum = CreateSparseArray();
+    for each SystemTextItem bobj in bar
+    {
+        pageNum = referencePageNumber + bobj.OnNthBlankPage;
+        bobjsOnPage = bobjsByPageNum[pageNum];
+        if (null = bobjsOnPage)
         {
-            currentPnum = pnum;
-            pb = CreateElement('pb');
-            AddAttribute(pb, 'n', pnum);
-            AddChild(parent, pb);
-            div = CreateElement('div');
-            AddChild(parent, div);
+            bobjsOnPage = CreateSparseArray();
+            bobjsByPageNum[pageNum] = bobjsOnPage;
         }
-        element = HandleStyle(TextHandlers, bobj);
-        if (null != element)
+        bobjsOnPage.Push(bobj);
+    }
+
+    for pageNum = startPageNum to endPageNum + 1
+    {
+        GenerateSystemAndPageBreaks(false, pageNum);
+
+        // <head> elements must be the first children of <div> for valid MEI.
+        // As the order in which Sibelius iterates over blank page text is
+        // arbitrary anyway, collect them separately and write them first.
+        headingsOnPage = CreateSparseArray();
+        nonHeadingTextOnPage = CreateSparseArray();
+
+        bobjsOnPage = bobjsByPageNum[pageNum];
+        if (null != bobjsOnPage)
         {
-            AddChild(div, element);
+            for each bobj in bobjsOnPage
+            {
+                element = HandleStyle(TextHandlers, bobj);
+                element['bobj'] = bobj;
+                if (null != element)
+                {
+                    if (element.name = 'head')
+                    {
+                        headingsOnPage.Push(element);
+                    }
+                    else
+                    {
+                        nonHeadingTextOnPage.Push(element);
+                    }
+                }
+            }
+        }
+
+        if (nonHeadingTextOnPage.Length + headingsOnPage.Length > 0)
+        {
+            elementsOnPage = headingsOnPage;
+            div = CreateElement('div');
+            AddChild(SectionElement, div);
+            if (null != ActiveVolta)
+            {
+                RegisterWarning(element.bobj, 'Blank page text must be encoded on wrong page', '<pb n=\'' & pageNum & '\'> starting a \'blank page\' is inside an <ending> element. Text content of that blank page can not be encoded inside this <ending> in schema conformant way and can is placed after the <ending> element.');
+            }
+            for each element in headingsOnPage.Concat(nonHeadingTextOnPage)
+            {
+                AddChild(div, element);
+            }
         }
     }
 } //$end

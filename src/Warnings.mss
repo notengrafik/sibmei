@@ -32,12 +32,19 @@ function RegisterWarning (barObject, warningType, message) {
         barNumber = barNumber & ' (' & bar.BarNumber & ')';
     }
 
-    staffName = '';
-    for each staffNameProperty in ReportableStaffNameProperties
+    if (staff.IsSystemStaff)
     {
-        if (('' = staffName or ' ' = staffName) and '' != staff.@staffNameProperty)
+        staffName = 'System staff';
+    }
+    else
+    {
+        staffName = '';
+        for each staffNameProperty in ReportableStaffNameProperties
         {
-            staffName = staff.@staffNameProperty;
+            if (('' = staffName or ' ' = staffName) and '' != staff.@staffNameProperty)
+            {
+                staffName = staff.@staffNameProperty;
+            }
         }
     }
 
