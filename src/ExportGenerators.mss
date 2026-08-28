@@ -360,6 +360,28 @@ function GenerateMeasure (num) {
                 {
                     ActiveVolta = MeiFactory(voltaTemplate);
                     ActiveVolta._property:endBarNumber = bobj.EndBarNumber;
+                    if (null = ActiveVolta.attrs['label'])
+                    {
+                        // Check for volta label text if we have a blank volta
+                        // bracket. Alas, the volta bracket text style is not
+                        // system attached.
+                        labelCount = 0;
+                        for each staff in Staves
+                        {
+                            for each Text text in staff.NthBar(num)
+                            {
+                                if (text.StyleId = 'text.staff.1st_n_2nd_endings')
+                                {
+                                    ActiveVolta.attrs['label'] = text.Text;
+                                    labelCount = labelCount + 1;
+                                }
+                            }
+                        }
+                        if (labelCount > 1)
+                        {
+                            RegisterWarning(bobj, 'Too many volta labels', labelCount & ' volta labels found');
+                        }
+                    }
                     AddChild(SectionElement, ActiveVolta);
                 }
             }
