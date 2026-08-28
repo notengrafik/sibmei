@@ -19,56 +19,120 @@ function ProcessScore () {
 }  //$end
 
 
-function ProcessFrontMatter (musicEl) {
-    if (SystemStaff.BarCount = 0)
+function ProcessPageAndSystemBreaks (bar) {
+    if (bar.NthBarInSystem > 0)
     {
+        // We're only interested in bars that start a new system
         return '';
     }
 
-    frontmatter = CreateDictionary();
-    bar = SystemStaff.NthBar(1);
+    barNum = bar.BarNumber;
+    if (barNum > 1)
+    {
+        precedingBar = SystemStaff.NthBar(barNum - 1);
+        pageNumOfPrecdingBar = precedingBar.OnNthPage + 1;
+    }
+    else
+    {
+        precedingBar = null;
+        pageNumOfPrecdingBar = -1;
+    }
 
+    if (null != precedingBar and precedingBar.NumBlankPages > 0)
+    {
+        ProcessBlankPages(
+            precedingBar,
+            pageNumOfPrecdingBar + 1,
+            pageNumOfPrecdingBar + precedingBar.NumBlankPages
+        );
+    }
+
+    pageNumOfCurrentBar = bar.OnNthPage + 1;
+
+    if (bar.NumBlankPagesBefore != 0)
+    {
+        ProcessBlankPages(
+            bar,
+            pageNumOfCurrentBar - bar.NumBlankPagesBefore,
+            pageNumOfCurrentBar - 1
+        );
+    }
+
+    if (pageNumOfPrecdingBar = pageNumOfCurrentBar)
+    {
+        // Continuing on the same page, only generate system break
+        GenerateSystemAndPageBreaks(true, '');
+    }
+    else
+    {
+        // Start new page with page and system breaks
+        GenerateSystemAndPageBreaks(true, pageNumOfCurrentBar);
+    }
+} //$end
+
+
+function ProcessBlankPages (bar, startPageNum, endPageNum) {
+    referencePageNumber = bar.OnNthPage + 1;
+    bobjsByPageNum = CreateSparseArray();
     for each SystemTextItem bobj in bar
     {
-        if (bobj.OnNthBlankPage < 0)
+        pageNum = referencePageNumber + bobj.OnNthBlankPage;
+        bobjsOnPage = bobjsByPageNum[pageNum];
+        if (null = bobjsOnPage)
         {
-            pnum = (bar.OnNthPage + bobj.OnNthBlankPage) + 1;
-
-            if (frontmatter.PropertyExists(pnum) = false)
-            {
-                pb = CreateElement('pb');
-                AddAttribute(pb, 'n', pnum);
-                frontmatter[pnum] = CreateSparseArray(pb);
-            }
-
-            pElement = AddFormattedText(null, CreateElement('p'), bobj);
-            divElement = CreateElement('div');
-            AddChild(divElement, pElement);
-            frontmatter[pnum].Push(divElement);
+            bobjsOnPage = CreateSparseArray();
+            bobjsByPageNum[pageNum] = bobjsOnPage;
         }
+        bobjsOnPage.Push(bobj);
     }
 
-    frontpages = frontmatter.GetPropertyNames();
-
-    if (frontpages.Length > 0)
+    for pageNum = startPageNum to endPageNum + 1
     {
-        // sort the front pages
-        // Log('front: ' & frontmatter);
-        sorted_front = utils.SortArray(frontpages, false);
-        frontEl = CreateElement('front');
-        for each pnum in sorted_front
-        {
-            pgels = frontmatter[pnum];
+        GenerateSystemAndPageBreaks(false, pageNum);
 
-            for each el in pgels
+        // <head> elements must be the first children of <div> for valid MEI.
+        // As the order in which Sibelius iterates over blank page text is
+        // arbitrary anyway, collect them separately and write them first.
+        headingsOnPage = CreateSparseArray();
+        nonHeadingTextOnPage = CreateSparseArray();
+
+        bobjsOnPage = bobjsByPageNum[pageNum];
+        if (null != bobjsOnPage)
+        {
+            for each bobj in bobjsOnPage
             {
-                AddChild(frontEl, el);
+                element = HandleStyle(TextHandlers, bobj);
+                element['bobj'] = bobj;
+                if (null != element)
+                {
+                    if (element.name = 'head')
+                    {
+                        headingsOnPage.Push(element);
+                    }
+                    else
+                    {
+                        nonHeadingTextOnPage.Push(element);
+                    }
+                }
             }
         }
 
-        AddChild(musicEl, frontEl);
+        if (nonHeadingTextOnPage.Length + headingsOnPage.Length > 0)
+        {
+            elementsOnPage = headingsOnPage;
+            div = CreateElement('div');
+            AddChild(SectionElement, div);
+            if (null != ActiveVolta)
+            {
+                RegisterWarning(element.bobj, 'Blank page text must be encoded on wrong page', '<pb n=\'' & pageNum & '\'> starting a \'blank page\' is inside an <ending> element. Text content of that blank page can not be encoded inside this <ending> in schema conformant way and can is placed after the <ending> element.');
+            }
+            for each element in headingsOnPage.Concat(nonHeadingTextOnPage)
+            {
+                AddChild(div, element);
+            }
+        }
     }
-}  //$end
+} //$end
 
 
 function ProcessEndingLines (bar) {

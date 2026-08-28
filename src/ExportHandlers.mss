@@ -1,8 +1,9 @@
 function InitHandlers () {
     Self._property:IsHandlerMethodThatExtensionsMayUse = CreateDictionary(
         'ControlEventTemplateHandler', true,
+        'LyricTemplateHandler', true,
         'ModifierTemplateHandler', true,
-        'LyricTemplateHandler', true
+        'TemplateHandler', true
     );
 
     InitSymbolHandlers();
@@ -133,6 +134,11 @@ function ControlEventTemplateHandler (this, bobj) {
 }  //$end
 
 
+function TemplateHandler (this, bobj) {
+    return MeiFactory(this.template, bobj);
+} //$end
+
+
 function HandleStyle (handlers, bobj) {
     // bobj must be an object with StyleId and StyleAsText properties (i.e. a
     // Line or Text object). A matching handler for the style is looked up and
@@ -147,3 +153,22 @@ function HandleStyle (handlers, bobj) {
         return handler.HandleObject(bobj);
     }
 } //$end
+
+
+function HandleBlankPageItem (m, bobj) {
+    // Only text and graphics may occur on blank pages, but we can't retrieve
+    // anything useful about graphics, so bobj will for now be a SystemTextItem
+    if (bobj.OnNthBlankPage < 0)
+    {
+        blankPages = 'precedingBlankPages';
+    }
+    else
+    {
+        blankPages = 'followingBlankPages';
+    }
+    if (null = m[blankPages])
+    {
+        m[blankPages] = CreateSparseArray();
+    }
+    m[blankPages].Push(bobj);
+}  //$end

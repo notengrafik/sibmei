@@ -147,15 +147,7 @@ function GenerateMEIMusic () {
     Self._property:MDivElement = null;
     Self._property:SectionElement = null;
 
-    // track page numbers
-    Self._property:CurrentPageNumber = null;
-    // We start the first page with a <pb> (good practice and helps Verovio)
-    Self._property:PageBreak = CreateElement('pb');
-    Self._property:SystemBreak = null;
-
     music = CreateElement('music');
-
-    ProcessFrontMatter(music);
 
     body = CreateElement('body');
     AddChild(music, body);
@@ -189,23 +181,10 @@ function GenerateMEIMusic () {
         }
         section = Self._property:SectionElement;
 
+        ProcessPageAndSystemBreaks(SystemStaff.NthBar(j));
         m = GenerateMeasure(j);
 
-        if (Self._property:PageBreak != null)
-        {
-            pb = Self._property:PageBreak;
-            AddChild(section, pb);
-            Self._property:PageBreak = null;
-        }
-
         currKeyS = SystemStaff.CurrentKeySignature(j);
-
-        if (Self._property:SystemBreak != null)
-        {
-            sb = Self._property:SystemBreak;
-            AddChild(section, sb);
-            Self._property:SystemBreak = null;
-        }
 
         // Do not try to get the signatures for bar 0 -- will not work
         if (j > 1)
@@ -255,6 +234,16 @@ function GenerateMEIMusic () {
         {
             AddChild(section, m);
         }
+    }
+
+    if (SystemStaff.BarCount < 1)
+    {
+        return music;
+    }
+    lastBar = SystemStaff.NthBar(SystemStaff.BarCount);
+    if (lastBar.NumBlankPages > 0)
+    {
+        ProcessBlankPages(lastBar, lastBar.OnNthPage + 2, lastBar.OnNthPage + 1 + lastBar.NumBlankPages);
     }
 
     return music;
@@ -307,25 +296,9 @@ function GenerateMeasure (num) {
         AddAttribute(m, 'metcon', 'false');
     }
 
-    if (sysBar.NthBarInSystem = 0)
-    {
-        Self._property:SystemBreak = CreateElement('sb');
-    }
-
     for each this_staff in Staves
     {
         bar = this_staff[num];
-
-        curr_pn = bar.OnNthPage;
-        if (curr_pn != Self._property:CurrentPageNumber)
-        {
-            Self._property:CurrentPageNumber = curr_pn;
-            pb = CreateElement('pb');
-
-            // pages are stored internally as 0-based, so increment by one for the 'human' representation.
-            AddAttribute(pb, 'n', curr_pn + 1);
-            Self._property:PageBreak = pb;
-        }
 
         if (bar.ExternalBarNumberString != bar.BarNumber and GetAttribute(m, 'label') = False)
         {
@@ -419,6 +392,30 @@ function GenerateMeasure (num) {
 
     return m;
 }  //$end
+
+
+function GenerateSystemAndPageBreaks (systemBreak, pageNum) {
+    if (null = ActiveVolta)
+    {
+        container = SectionElement;
+    }
+    else
+    {
+        container = ActiveVolta;
+    }
+
+    if ('' != pageNum)
+    {
+        pb = CreateElement('pb');
+        AddAttribute(pb, 'n', pageNum);
+        AddChild(container, pb);
+    }
+
+    if (systemBreak)
+    {
+        AddChild(container, CreateElement('sb'));
+    }
+} //$end
 
 
 function GenerateStaff (staff, measurenum) {

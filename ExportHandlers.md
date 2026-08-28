@@ -70,7 +70,7 @@ api.RegisterTextHandlers('StyleId', 'ControlEventTemplateHandler', CreateDiction
 The registration functions require three arguments:
 
 * The ID-like property under which the Handlers should be registered. This can be `'StyleId'` or `'StyleAsText'` for text, lyrics and lines. As Sibelius' line objects do not have these two properties,  `'Index'` or `'Name'` has to be used for them instead.
-* The name of the Handler method that will be responsible for converting the Sibelius object to an MEI element. This should usually be either of the methods `'ControlEventTemplateHandler'`, `'ModifierTemplateHandler'` or `'LyricTemplateHandler'` provided by Sibmei. The names of custom handlers provided by an extension for special requirements can be given as well (see [below](#handler-methods) for more information).
+* The name of the Handler method that will be responsible for converting the Sibelius object to an MEI element. This should usually be either of the methods `'ControlEventTemplateHandler'`, `'ModifierTemplateHandler'`, `'LyricTemplateHandler'` or `'TemplateHandler'` provided by Sibmei. The names of custom handlers provided by an extension for special requirements can be given as well (see [below](#handler-methods) for more information).
 * A dictionary that maps ID values to element templates. Keys are values of the `StyleId`, `StyleAsText`, `Index` or `Name` properties, depending on what was given as the first parameter to the registration function. If the Handler method given in the second parameter is not template-based, the value can be set to `null` instead of a template.
 
 #### Registering lyrics Handlers
@@ -169,9 +169,11 @@ In general, Handler object's `HandleObject()` method is set to one of the follow
 
 * `ControlEventTemplateHandler()` uses [`GenerateControlEvent()`](#apigeneratecontrolevent) to create a `<measure>`-attached control event.
 
-*  `ModifierTemplateHandler()` uses [`GenerateModifier()`](#apigeneratemodifier) to create an element that is attached to the closest `<note>`, `<rest>` or `<chord>`.
+* `ModifierTemplateHandler()` uses [`GenerateModifier()`](#apigeneratemodifier) to create an element that is attached to the closest `<note>`, `<rest>` or `<chord>`.
 
-*  `LyricTemplateHandler()` attaches the created element to `<note>`, `<rest>` or `<chord>` as well, but warns if the closest element is a rest.
+* `LyricTemplateHandler()` attaches the created element to `<note>`, `<rest>` or `<chord>` as well, but warns if the closest element is a rest.
+
+* `TemplateHandler()` is currently only used for registering blank page text styles.
 
 ### Writing a Handler method
 

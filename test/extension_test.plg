@@ -47,6 +47,11 @@
       )
     ));
 
+    api.RegisterTextHandlers('StyleId', 'TemplateHandler', CreateDictionary(
+        // Example of a blank page text
+        'text.blankpage.boxed', @Element('div', @Attrs('type', 'my-boxed-text'), api.FormattedText)
+    ));
+
     api.RegisterTextHandlers('StyleId', 'ControlEventTemplateHandler', CreateDictionary(
       // Example of a overridden built-in style
       'text.staff.plain', @Element('dir', @Attrs(), api.UnformattedText)
