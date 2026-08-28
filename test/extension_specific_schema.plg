@@ -3,7 +3,7 @@
   CustomSchemaLocation "https://example.com/schema/custom.rng"
 
   Initialize "() {
-    AddToPluginsMenu('Sibmei extension schema test', 'Run');
+    AddToPluginsMenu('Sibmei ' & PluginVersion & ' extension schema test', 'Run');
   }"
 
   InitSibmeiExtension "(api) {

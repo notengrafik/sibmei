@@ -3,7 +3,7 @@
   CustomSchemaLocation "noSchema"
 
   Initialize "() {
-    AddToPluginsMenu('Sibmei extension with empty schemas test', 'Run');
+    AddToPluginsMenu('Sibmei ' & PluginVersion & ' extension with empty schemas test', 'Run');
   }"
 
   InitSibmeiExtension "(api) {
