@@ -236,6 +236,10 @@ function GenerateMEIMusic () {
         }
     }
 
+    if (SystemStaff.BarCount < 1)
+    {
+        return music;
+    }
     lastBar = SystemStaff.NthBar(SystemStaff.BarCount);
     if (lastBar.NumBlankPages > 0)
     {
