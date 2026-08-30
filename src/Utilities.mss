@@ -722,6 +722,180 @@ function InitFigbassCharMap () {
 }  //$end
 
 
+function InitMusicTextToSmuflMap () {
+    // TODO: Let the compiler fetch
+    // https://smufl.formats.music/metadata/glyphnames.json
+    // or add a submodule and comile the JSON into global variable map.
+
+    // Start with a reverse map, which is nicer to read and maintain
+    reverseSmuflMap = CreateDictionary(
+        'E047', 'segno',
+        'E048', 'coda',
+        'E082', 'timeSig2',
+        'E084', 'timeSig4',
+        'E085', 'timeSig5',
+        'E086', 'timeSig6',
+        'E1F1', 'textBlackNoteLongStem',
+        'E1F3', 'textBlackNoteFrac8thLongStem',
+        'E1F5', 'textBlackNoteFrac16thLongStem',
+        'E1F6', 'textBlackNoteFrac32ndLongStem',
+        'E1FA', 'textCont16thBeamLongStem',
+        'E1FB', 'textCont32ndBeamLongStem',
+        'E1FD', 'textTie',
+        'E201', 'textTupletBracketStartLongStem',
+        'E202', 'textTuplet3LongStem',
+        'E203', 'textTupletBracketEndLongStem',
+        'E2F9', 'accidentalEnharmonicTilde',
+        'E520', 'dynamicPiano',
+        'E521', 'dynamicMezzo',
+        'E522', 'dynamicForte',
+        'E523', 'dynamicRinforzando',
+        'E524', 'dynamicSforzando',
+        'E525', 'dynamicZ',
+        'E526', 'dynamicNiente',
+        'E551', 'lyricsElision',
+        'E612', 'stringsUpBow',
+        'E650', 'keyboardPedalPed',
+        'E680', 'harpPedalRaised',
+        'E681', 'harpPedalCentered',
+        'E682', 'harpPedalLowered',
+        'E683', 'harpPedalDivider',
+        'E873', 'csymMajorSeventh',
+        'E880', 'tuplet0',
+        'E881', 'tuplet1',
+        'E882', 'tuplet2',
+        'E883', 'tuplet3',
+        'E884', 'tuplet4',
+        'E885', 'tuplet5',
+        'E886', 'tuplet6',
+        'E887', 'tuplet7',
+        'E888', 'tuplet8',
+        'E889', 'tuplet9',
+        'E88A', 'tupletColon',
+        'EA53', 'figbass2Raised',
+        'EA56', 'figbass4Raised',
+        'EA58', 'figbass5Raised1',
+        'EA67', 'figbassDoubleSharp',
+        'EA6F', 'figbass6Raised',
+        'EC60', 'miscDoNotPhotocopy',
+        'ECA0', 'metNoteDoubleWhole',
+        'ECA1', 'metNoteDoubleWholeSquare',
+        'ECA2', 'metNoteWhole',
+        'ECA3', 'metNoteHalfUp',
+        'ECA5', 'metNoteQuarterUp',
+        'ECA7', 'metNote8thUp',
+        'ECA9', 'metNote16thUp',
+        'ECAB', 'metNote32ndUp',
+        'ECAD', 'metNote64thUp',
+        'ECB7', 'metAugmentationDot',
+        'ED60', 'csymAccidentalFlat',
+        'ED61', 'csymAccidentalNatural',
+        'ED62', 'csymAccidentalSharp',
+        'ED63', 'csymAccidentalDoubleSharp',
+        'E4EF', 'restHBarLeft',
+        'E4F1', 'restHBarRight',
+        'EA5E', 'figbass7Raised1',
+        'EA62', 'figbass9Raised',
+        'EA5A', 'figbass5Raised3',
+        'ED64', 'csymAccidentalDoubleFlat'
+    );
+
+    smufl = CreateDictionary();
+    for each Name codepointAsString in reverseSmuflMap
+    {
+        glyphName = reverseSmuflMap[codepointAsString];
+        codepoint = ParseHex(codepointAsString);
+        if (codepoint >= (256 * 256))
+        {
+            StopPlugin('Codepoint for ' & glyphName & ' is out of range (' & codepointAsString & '). SMuFL codepoints should be 2 bytes.');
+        }
+        smufl[glyphName] = Chr(codepoint);
+    }
+
+    map = CreateSparseArray();
+
+    map['#'] = smufl.csymAccidentalSharp;
+    map['$'] = smufl.segno;
+    // not sure what this is for
+    map['%'] = '6/9';
+    map['('] = smufl.textTie;
+    map[')'] = smufl.textTie;
+    map['.'] = smufl.metAugmentationDot;
+
+    // Not sure if the follwoing glyphs are intended to be tuplet digits/colons
+    map['0'] = smufl.tuplet0;
+    map['1'] = smufl.tuplet1;
+    map['2'] = smufl.tuplet2;
+    map['3'] = smufl.tuplet3;
+    map['4'] = smufl.tuplet4;
+    map['5'] = smufl.tuplet5;
+    map['6'] = smufl.tuplet6;
+    map['7'] = smufl.tuplet7;
+    map['8'] = smufl.tuplet8;
+    map['9'] = smufl.tuplet9;
+    map[':'] = smufl.tupletColon;
+
+    map['@'] = smufl.segno;
+    map['B'] = smufl.figbass2Raised;
+    map['D'] = smufl.figbass4Raised;
+    map['E'] = smufl.figbass5Raised1;
+    map['J'] = smufl.textTuplet3LongStem;
+    map['K'] = smufl.textTupletBracketStartLongStem & smufl.textTuplet3LongStem & smufl.textTupletBracketEndLongStem;
+    map['L'] = smufl.harpPedalRaised;
+    map['M'] = smufl.harpPedalCentered;
+    map['N'] = smufl.harpPedalLowered;
+    map['O'] = smufl.harpPedalDivider;
+    map['P'] = smufl.keyboardPedalPed;
+    map['V'] = smufl.metNoteDoubleWholeSquare;
+    map['W'] = smufl.metNoteDoubleWhole;
+    map['X'] = smufl.csymAccidentalDoubleSharp;
+
+    map['^'] = smufl.csymMajorSeventh;
+    map['_'] = smufl.lyricsElision;
+    map['b'] = smufl.csymAccidentalFlat;
+    map['e'] = smufl.metNote8thUp;
+    map['f'] = smufl.dynamicForte;
+    map['h'] = smufl.metNoteHalfUp;
+    map['i'] = smufl.metNoteQuarterUp;
+    map['j'] = smufl.textBlackNoteLongStem & smufl.textCont16thBeamLongStem;
+    map['k'] = smufl.textBlackNoteLongStem & smufl.textCont32ndBeamLongStem;
+    map['m'] = smufl.dynamicMezzo;
+    map['n'] = smufl.dynamicNiente;
+    map['p'] = smufl.dynamicPiano;
+    map['q'] = smufl.metNoteQuarterUp;
+    map['r'] = smufl.dynamicRinforzando;
+    map['s'] = smufl.dynamicSforzando;
+    map['w'] = smufl.metNoteWhole;
+    map['x'] = smufl.metNote16thUp;
+    map['y'] = smufl.metNote32ndUp;
+    map['z'] = smufl.dynamicZ;
+    map['{'] = smufl.restHBarLeft;
+    map['|'] = smufl.miscDoNotPhotocopy;
+    map['}'] = smufl.restHBarRight;
+    // `accidentalEnharmonicTilde` seems to be visually closest
+    map['~'] = smufl.accidentalEnharmonicTilde;
+    map['§'] = smufl.csymAccidentalNatural;
+    map['°'] = smufl.csymAccidentalDoubleFlat;
+    map['¼'] = smufl.figbass4Raised;
+    map['½'] = smufl.figbass2Raised;
+    map['¾'] = smufl.figbass5Raised1;
+    map['¿'] = smufl.figbass6Raised;
+    map['Á'] = smufl.figbass7Raised1;
+    map['À'] = smufl.figbass9Raised;
+    map['Â'] = smufl.figbass5Raised3;
+    map['×'] = smufl.csymAccidentalDoubleSharp;
+    map['Ø'] = smufl.coda;
+    map['Ý'] = smufl.metNoteDoubleWholeSquare;
+    // No idea what the following symbol is. It doesn't seem to be in SMuFL.
+    // Here is an approximation using Unicode:
+    map['÷'] = '˙=.';
+    // This is a different coda style that has no direct equivalent in SMuFL
+    map['ø'] = smufl.coda;
+
+    return map;
+}  //$end
+
+
 export function MeiFactory (data, bobj) {
     // Parameter `data` is a template SparseArray with the following entries:
     //
@@ -865,4 +1039,32 @@ function NoteInFirstMatchingVoice (bobj) {
             return noteRest;
         }
     }
+}  //$end
+
+
+function InitHexDigitValues () {
+    map = CreateSparseArray();
+    for char = '0' to '9' + 1
+    {
+        map[char] = char - '0';
+    }
+    for char = 'A' to 'F'
+    {
+        map[char] = char - 'A' + 10;
+    }
+    for char = 'a' to 'f'
+    {
+        map[char] = char - 'a' + 10;
+    }
+    return map;
+}  //$end
+
+
+function ParseHex (string) {
+    value = 0;
+    for i = 0 to Length(string)
+    {
+        value = 16 * value + HexDigitValues[CharAt(string, i)];
+    }
+    return value;
 }  //$end
