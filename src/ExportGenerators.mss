@@ -558,17 +558,17 @@ function GenerateNoteRest (bobj, layer) {
 
     if (bobj.GetArticulation(PauseArtic))
     {
-        GenerateFermata(bobj, 'curved', ConvertFermataForm(bobj));
+        GenerateFermata(bobj, nr, 'curved', ConvertFermataForm(bobj));
     }
 
     if (bobj.GetArticulation(SquarePauseArtic))
     {
-        GenerateFermata(bobj, 'square', ConvertFermataForm(bobj));
+        GenerateFermata(bobj, nr, 'square', ConvertFermataForm(bobj));
     }
 
     if (bobj.GetArticulation(TriPauseArtic))
     {
-        GenerateFermata(bobj, 'angular', ConvertFermataForm(bobj));
+        GenerateFermata(bobj, nr, 'angular', ConvertFermataForm(bobj));
     }
 
     if (bobj.GetArticulation(StaccatoArtic))
@@ -922,15 +922,15 @@ function GenerateBarRest (bobj) {
     switch (bobj.PauseType) {
         case(PauseTypeRound)
         {
-            GenerateFermata(bobj, 'curved', ConvertFermataForm(bobj));
+            GenerateFermata(bobj, obj, 'curved', ConvertFermataForm(bobj));
         }
         case(PauseTypeTriangular)
         {
-            GenerateFermata(bobj, 'angular', ConvertFermataForm(bobj));
+            GenerateFermata(bobj, obj, 'angular', ConvertFermataForm(bobj));
         }
         case(PauseTypeSquare)
         {
-            GenerateFermata(bobj, 'square', ConvertFermataForm(bobj));
+            GenerateFermata(bobj, obj, 'square', ConvertFermataForm(bobj));
         }
     }
 
@@ -1219,12 +1219,16 @@ function GenerateArpeggio (bobj) {
 }  //$end
 
 
-function GenerateFermata (bobj, shape, form) {
+function GenerateFermata (bobj, noteRestElement, shape, form) {
     //$module(ExportGenerators.mss)
     fermata = GenerateControlEvent(bobj, CreateElement('fermata'));
 
     AddAttribute(fermata, 'form', form);
     AddAttribute(fermata, 'shape', shape);
+    if (null != noteRestElement)
+    {
+        AddAttribute(fermata, 'startid', noteRestElement._id);
+    }
 
     return fermata;
 }  //$end
