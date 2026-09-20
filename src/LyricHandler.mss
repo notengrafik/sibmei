@@ -50,7 +50,7 @@ function LyricTemplateHandler (this, lyricItem) {
 
     if (parentElement = null)
     {
-        Log('Could not find note object for syl ' & lyricItem);
+        RegisterWarning(lyricItem, 'Could not find note object for syl', lyricItem.Text);
         return null;
     }
 
@@ -60,8 +60,55 @@ function LyricTemplateHandler (this, lyricItem) {
     }
 
     element = MeiFactory(this.template, lyricItem);
+
+    // Try inserting <verse> elements in a sensible order
+    verseN = GetVerseN(element);
+    if (verseN >= 0)
+    {
+        siblings = parentElement.children;
+        for i = 0 to siblings.Length
+        {
+            siblingVerseN = GetVerseN(siblings[i]);
+            if (GetVerseN(siblings[i]) > verseN)
+            {
+                AddChildAtPosition(parentElement, element, i);
+                return element;
+            }
+        }
+    }
+
     AddChild(parentElement, element);
     return element;
+}  //$end
+
+
+function GetVerseN (element) {
+    // Argument can either be an element Dictionary or an ID (string).
+    // Returns the @n attribute as number, or -1 in case the element doesn't
+    // exist, is not a <verse> element or has no positive numeric @n attribute.
+    if (not IsObject(element))
+    {
+        element = GetElementById(element);
+        if (null = element)
+        {
+            return -1;
+        }
+    }
+
+    if (element.name != 'verse')
+    {
+        return -1;
+    }
+
+    n = GetAttribute(element, 'n');
+    if (SplitString(n, '012345679', true).NumChildren > 0)
+    {
+        // n contains non-digit characters
+        return -1;
+    }
+
+    // n is an integer
+    return (n & '') + 0;
 }  //$end
 
 
